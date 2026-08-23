@@ -116,7 +116,7 @@ export class CanvasRenderer {
     // 4. Interactive Callout below central node
     if (!isTerminalOpen) {
       const hintY = center.y + radius + 28;
-      const hintText = "[ ✦ CLICK NODE OR PRESS ANY KEY TO OPEN TERMINAL ]";
+      const hintText = "[ ✦ CLICK NODE TO OPEN TERMINAL ]";
       ctx.font = "bold 10px 'JetBrains Mono', monospace";
       ctx.fillStyle = `rgba(0, 204, 204, ${0.7 + pulse * 0.3})`;
       ctx.shadowColor = "#00cccc";
@@ -255,7 +255,7 @@ export class CanvasRenderer {
       ctx.restore();
     }
 
-    // 5. Draw Cluster Zone Hover Stat Card (Auto-sized and clamped)
+    // 5. Draw Cluster Zone Hover Stat Card
     if (hoveredCluster) {
       this.drawClusterHoverCard(hoveredCluster);
     }
@@ -279,7 +279,6 @@ export class CanvasRenderer {
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
 
-    // Smart vertical positioning: if cluster is in lower half, position ABOVE cluster
     let boxY: number;
     if (cluster.center.y > screenH * 0.52) {
       boxY = cluster.center.y - cluster.radius - boxHeight - 20;
@@ -287,7 +286,6 @@ export class CanvasRenderer {
       boxY = cluster.center.y + cluster.radius + 20;
     }
 
-    // Clamp inside viewport
     boxY = Math.max(65, Math.min(screenH - boxHeight - 20, boxY));
 
     let boxX = cluster.center.x;
@@ -369,7 +367,7 @@ export class CanvasRenderer {
   public drawLegendOverlay(_width: number, height: number, isCollapsed: boolean): void {
     const ctx = this.ctx;
     const x = 20;
-    const y = height - (isCollapsed ? 44 : 170);
+    const y = height - (isCollapsed ? 92 : 218);
     const w = 260;
     const h = isCollapsed ? 32 : 155;
 

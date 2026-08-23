@@ -65,7 +65,7 @@ export class TerminalWindow {
   }
 
   private setupEvents(): void {
-    // Nav buttons
+    // Nav buttons open the terminal directly to that tab
     document.querySelectorAll(".nav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const tab = (btn as HTMLElement).dataset.tab;
@@ -111,18 +111,7 @@ export class TerminalWindow {
       });
     }
 
-    // Pressing any key opens terminal if closed
-    window.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (!this.isTerminalOpen && e.key !== "Tab" && e.key !== "Escape") {
-        this.openTerminal();
-        const cliInput = this.container.querySelector("#terminal-cli-input") as HTMLInputElement;
-        if (cliInput && e.key.length === 1) {
-          cliInput.focus();
-        }
-      }
-    });
-
-    // CLI input bar
+    // CLI input bar inside terminal
     const cliInput = this.container.querySelector("#terminal-cli-input") as HTMLInputElement;
     cliInput.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -306,7 +295,6 @@ export class TerminalWindow {
     form.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
 
-      // Clear existing errors
       ["err-c-name", "err-c-email", "err-c-message"].forEach((id) => {
         const errEl = this.container.querySelector(`#${id}`);
         if (errEl) errEl.textContent = "";

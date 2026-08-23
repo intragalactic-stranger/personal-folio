@@ -78,14 +78,14 @@ export class PhysicsEngine {
         !this.isTerminalOpen &&
         e.clientX >= 20 &&
         e.clientX <= 280 &&
-        e.clientY >= window.innerHeight - 170 &&
-        e.clientY <= window.innerHeight - 12
+        e.clientY >= window.innerHeight - 240 &&
+        e.clientY <= window.innerHeight - 70
       ) {
         this.isLegendCollapsed = !this.isLegendCollapsed;
         return;
       }
 
-      // 2. Check if a specific particle node was clicked
+      // 2. Check if a specific particle node was clicked (shows tooltip, stays on graph)
       if (!this.isTerminalOpen) {
         let clickedParticle = false;
         for (const c of this.clusters) {
@@ -109,13 +109,16 @@ export class PhysicsEngine {
         if (clickedParticle) return;
       }
 
-      // 3. Check Central Profile Node click
+      // 3. ONLY clicking on Central Profile Node opens the terminal
       const clickDist = this.centerNode.dist(clickPos);
-      if (clickDist < 85 || !this.isTerminalOpen) {
+      if (clickDist < 85) {
         this.selectedNode = null;
         if (this.onCenterNodeClickCallback) {
           this.onCenterNodeClickCallback();
         }
+      } else {
+        // Clicking on empty canvas deselects any active node tooltip
+        this.selectedNode = null;
       }
     });
 
@@ -196,7 +199,6 @@ export class PhysicsEngine {
     const height = window.innerHeight;
     this.centerNode.set(width / 2, height / 2);
 
-    // Satellite positions with ample padding from screen edges
     const clusterPositions = [
       { x: width * 0.18, y: height * 0.26, count: 20, radius: 80, color: "#00cccc" }, // 01 Agentic Systems
       { x: width * 0.82, y: height * 0.26, count: 20, radius: 80, color: "#3888ff" }, // 02 Graph RAG
@@ -244,7 +246,6 @@ export class PhysicsEngine {
   private update(): void {
     this.starfield.update();
 
-    // Cursor repulsion physics
     if (this.mousePos) {
       const mouse = this.mousePos;
       const rRepulse = this.mouseRadius;
@@ -266,7 +267,6 @@ export class PhysicsEngine {
       }
     }
 
-    // Cluster gravitation & spring update
     for (const cluster of this.clusters) {
       cluster.update();
     }
