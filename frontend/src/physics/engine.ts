@@ -31,7 +31,7 @@ export class PhysicsEngine {
     this.ctx = ctx;
     this.renderer = new CanvasRenderer(this.ctx);
     this.starfield = new Starfield();
-    this.centerNode = new Vector2D(window.innerWidth / 2, window.innerHeight / 2);
+    this.centerNode = new Vector2D(window.innerWidth / 2, window.innerHeight / 2 + 10);
 
     this.setupListeners();
     this.handleResize();
@@ -77,15 +77,15 @@ export class PhysicsEngine {
       if (
         !this.isTerminalOpen &&
         e.clientX >= 20 &&
-        e.clientX <= 280 &&
-        e.clientY >= window.innerHeight - 240 &&
-        e.clientY <= window.innerHeight - 70
+        e.clientX <= 260 &&
+        e.clientY >= window.innerHeight - 170 &&
+        e.clientY <= window.innerHeight - 10
       ) {
         this.isLegendCollapsed = !this.isLegendCollapsed;
         return;
       }
 
-      // 2. Check if a specific particle node was clicked (shows tooltip, stays on graph)
+      // 2. Check if a specific particle node was clicked (shows tooltip, stays in graph view)
       if (!this.isTerminalOpen) {
         let clickedParticle = false;
         for (const c of this.clusters) {
@@ -109,7 +109,7 @@ export class PhysicsEngine {
         if (clickedParticle) return;
       }
 
-      // 3. ONLY clicking on Central Profile Node opens the terminal
+      // 3. ONLY clicking on Central Profile Node opens the terminal inspector
       const clickDist = this.centerNode.dist(clickPos);
       if (clickDist < 85) {
         this.selectedNode = null;
@@ -189,7 +189,7 @@ export class PhysicsEngine {
     this.ctx.resetTransform();
     this.ctx.scale(this.dpr, this.dpr);
 
-    this.centerNode.set(width / 2, height / 2);
+    this.centerNode.set(width / 2, height / 2 + 10);
     this.starfield.resize(width, height);
   }
 
@@ -197,14 +197,20 @@ export class PhysicsEngine {
     this.clusters = [];
     const width = window.innerWidth;
     const height = window.innerHeight;
-    this.centerNode.set(width / 2, height / 2);
+    const cx = width / 2;
+    const cy = height / 2 + 10;
+    this.centerNode.set(cx, cy);
 
+    const Rx = Math.min(width * 0.37, Math.max(340, width * 0.34));
+    const Ry = Math.min(height * 0.35, Math.max(210, height * 0.31));
+
+    // Balanced 5-cluster orbital arrangement with generous clearance from central node
     const clusterPositions = [
-      { x: width * 0.18, y: height * 0.26, count: 20, radius: 80, color: "#00cccc" }, // 01 Agentic Systems
-      { x: width * 0.82, y: height * 0.26, count: 20, radius: 80, color: "#3888ff" }, // 02 Graph RAG
-      { x: width * 0.84, y: height * 0.70, count: 18, radius: 78, color: "#00cccc" }, // 03 Evals & Infra
-      { x: width * 0.16, y: height * 0.70, count: 20, radius: 80, color: "#3888ff" }, // 04 Cloud & Platforms
-      { x: width * 0.50, y: height * 0.76, count: 18, radius: 75, color: "#00cccc" }, // 05 Forecasting & ML
+      { x: cx - Rx * 0.88, y: cy - Ry * 0.65, count: 18, radius: 85, color: "#00cccc" }, // 01 Agentic Systems (Top-Left)
+      { x: cx + Rx * 0.88, y: cy - Ry * 0.65, count: 18, radius: 85, color: "#3888ff" }, // 02 Graph RAG (Top-Right)
+      { x: cx + Rx * 0.86, y: cy + Ry * 0.68, count: 18, radius: 85, color: "#00cccc" }, // 03 Evals & Infra (Bottom-Right)
+      { x: cx - Rx * 0.86, y: cy + Ry * 0.68, count: 18, radius: 85, color: "#3888ff" }, // 04 Cloud & Platforms (Bottom-Left)
+      { x: cx,             y: cy - Ry * 0.96, count: 18, radius: 80, color: "#00cccc" }, // 05 Forecasting & ML (Top-Center)
     ];
 
     clusterPositions.forEach((cp, idx) => {
@@ -214,7 +220,7 @@ export class PhysicsEngine {
           center: new Vector2D(cp.x, cp.y),
           particleCount: cp.count,
           radius: cp.radius,
-          gravityStrength: 0.022,
+          gravityStrength: 0.02,
           color: cp.color,
         })
       );

@@ -20,7 +20,7 @@
 
     <!-- Top Monospace Navigation Bar -->
     <header class="top-nav">
-      <div class="brand-section" title="Toggle Terminal / Graph Universe">
+      <div class="brand-section" id="nav-brand-btn" title="Toggle Terminal / Graph Universe">
         <div class="status-dot"></div>
         <span class="brand-title">GANESHAN_ARUMUGANAINAR</span>
         <span class="brand-role">// AI_SOFTWARE_ENGINEER</span>
@@ -34,6 +34,11 @@
           <li><button class="nav-btn" data-tab="experience">[04 // EXPERIENCE]</button></li>
           <li><button class="nav-btn" data-tab="contact">[05 // CONTACT]</button></li>
           <li>
+            <button class="nav-btn view-toggle-nav-btn" id="nav-graph-toggle-btn" title="Toggle Graph Universe / Terminal">
+              <span>⬡</span> GRAPH_VIEW
+            </button>
+          </li>
+          <li>
             <a href="https://ganeshan.dev" target="_blank" class="cv-nav-btn" title="Download Ganeshan Arumuganainar CV">
               <span>⬇</span> CV.PDF
             </a>
@@ -46,11 +51,6 @@
         </ul>
       </nav>
     </header>
-
-    <!-- Floating Graph Universe / Terminal Toggle Button -->
-    <button class="graph-universe-toggle" id="float-graph-view-btn" title="Toggle between Full Graph Universe and Terminal Inspector">
-      <span>⌨</span> OPEN_TERMINAL
-    </button>
 
     <!-- Main Container -->
     <main class="app-container">

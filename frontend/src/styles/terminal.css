@@ -88,6 +88,7 @@
   border-radius: 3px;
   transition: all 0.2s ease;
   font-family: var(--font-mono);
+  cursor: pointer;
 }
 
 .nav-btn:hover, .nav-btn.active {
@@ -95,6 +96,23 @@
   border-color: rgba(0, 204, 204, 0.4);
   background: rgba(0, 204, 204, 0.08);
   text-shadow: var(--glow-cyan);
+}
+
+.view-toggle-nav-btn {
+  background: rgba(0, 204, 204, 0.1);
+  border: 1px solid rgba(0, 204, 204, 0.35);
+  color: #00cccc;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.view-toggle-nav-btn:hover {
+  background: #00cccc;
+  color: #080b10;
+  box-shadow: 0 0 10px rgba(0, 204, 204, 0.5);
 }
 
 .cv-nav-btn {
@@ -130,6 +148,7 @@
   gap: 0.4rem;
   box-shadow: 0 0 10px rgba(0, 204, 204, 0.25);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .assistant-toggle-btn:hover {
@@ -152,35 +171,6 @@
   opacity: 0;
   pointer-events: none;
   transform: scale(0.96) translateY(20px);
-}
-
-/* Floating Graph Universe Toggle Button - Bottom Left Stacked */
-.graph-universe-toggle {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 260px;
-  justify-content: center;
-  background: rgba(8, 12, 18, 0.94);
-  border: 1px solid var(--color-blue-primary);
-  color: var(--color-blue-primary);
-  padding: 0.5rem 1rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border-radius: 4px;
-  backdrop-filter: blur(14px);
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 0 16px rgba(0, 204, 204, 0.3);
-  transition: all 0.2s ease;
-}
-
-.graph-universe-toggle:hover {
-  background: var(--color-blue-primary);
-  color: #080b10;
-  box-shadow: var(--glow-cyan);
 }
 
 /* Terminal Shell Window */

@@ -51,12 +51,12 @@ export class CanvasRenderer {
   public drawCentralNode(center: Vector2D, isTerminalOpen: boolean): void {
     const ctx = this.ctx;
     const pulse = (Math.sin(this.pulseTimer) + 1) / 2;
-    const radius = 74;
+    const radius = 72;
 
     ctx.save();
 
     // 1. Outer pulsing ring
-    const ringRadius = radius + 10 + pulse * 6;
+    const ringRadius = radius + 9 + pulse * 5;
     ctx.strokeStyle = `rgba(0, 204, 204, ${0.25 + pulse * 0.25})`;
     ctx.lineWidth = 1.2;
     ctx.setLineDash([6, 6]);
@@ -93,19 +93,19 @@ export class CanvasRenderer {
     ctx.textBaseline = "middle";
 
     // Status indicator
-    ctx.font = "bold 11px 'JetBrains Mono', monospace";
+    ctx.font = "bold 10.5px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#4ade80";
     ctx.shadowColor = "#4ade80";
     ctx.shadowBlur = 6;
-    ctx.fillText("● AI_CORE_NODE", center.x, center.y - 32);
+    ctx.fillText("● AI_CORE_NODE", center.x, center.y - 30);
 
     // Big Name
     ctx.font = "bold 13px 'JetBrains Mono', monospace";
     ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
     ctx.shadowColor = "#00cccc";
     ctx.shadowBlur = 10;
-    ctx.fillText("GANESHAN", center.x, center.y - 12);
-    ctx.fillText("ARUMUGANAINAR", center.x, center.y + 6);
+    ctx.fillText("GANESHAN", center.x, center.y - 10);
+    ctx.fillText("ARUMUGANAINAR", center.x, center.y + 7);
 
     // Headline tag
     ctx.font = "9px 'JetBrains Mono', monospace";
@@ -115,7 +115,7 @@ export class CanvasRenderer {
 
     // 4. Interactive Callout below central node
     if (!isTerminalOpen) {
-      const hintY = center.y + radius + 28;
+      const hintY = center.y + radius + 22;
       const hintText = "[ ✦ CLICK NODE TO OPEN TERMINAL ]";
       ctx.font = "bold 10px 'JetBrains Mono', monospace";
       ctx.fillStyle = `rgba(0, 204, 204, ${0.7 + pulse * 0.3})`;
@@ -138,7 +138,7 @@ export class CanvasRenderer {
     for (const cluster of clusters) {
       const isHovered = hoveredCluster?.id === cluster.id;
 
-      // 1. Draw Master Constellation Trunk
+      // 1. Draw Constellation Trunk
       ctx.save();
       const trunkGrad = ctx.createLinearGradient(
         centerNode.x,
@@ -159,7 +159,7 @@ export class CanvasRenderer {
       ctx.stroke();
       ctx.restore();
 
-      // 2. Draw cluster title badge in a dark pill background
+      // 2. Draw cluster title badge
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -190,7 +190,7 @@ export class CanvasRenderer {
         for (let j = i + 1; j < pLen; j++) {
           const p2 = cluster.particles[j];
           const distSq = (p1.pos.x - p2.pos.x) ** 2 + (p1.pos.y - p2.pos.y) ** 2;
-          const maxDist = 75;
+          const maxDist = 80;
           if (distSq < maxDist * maxDist) {
             const dist = Math.sqrt(distSq);
             const lineAlpha = (1 - dist / maxDist) * 0.28;
@@ -367,9 +367,9 @@ export class CanvasRenderer {
   public drawLegendOverlay(_width: number, height: number, isCollapsed: boolean): void {
     const ctx = this.ctx;
     const x = 20;
-    const y = height - (isCollapsed ? 92 : 218);
-    const w = 260;
-    const h = isCollapsed ? 32 : 155;
+    const y = height - (isCollapsed ? 38 : 160);
+    const w = isCollapsed ? 145 : 240;
+    const h = isCollapsed ? 26 : 145;
 
     ctx.save();
     ctx.fillStyle = "rgba(6, 10, 16, 0.92)";
@@ -387,19 +387,19 @@ export class CanvasRenderer {
     // Header
     ctx.font = "bold 10px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00cccc";
-    ctx.fillText(`⬡ GRAPH LEGEND [${isCollapsed ? "+" : "—"}]`, x + 12, y + 16);
+    ctx.fillText(`⬡ LEGEND [${isCollapsed ? "+" : "—"}]`, x + 10, y + 13);
 
     if (!isCollapsed) {
       ctx.font = "9px 'JetBrains Mono', monospace";
       TECH_CLUSTERS_CONFIG.forEach((cfg, i) => {
-        const itemY = y + 42 + i * 22;
+        const itemY = y + 36 + i * 21;
         ctx.fillStyle = cfg.color;
         ctx.beginPath();
-        ctx.arc(x + 16, itemY, 3.5, 0, Math.PI * 2);
+        ctx.arc(x + 14, itemY, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-        ctx.fillText(cfg.theme, x + 26, itemY);
+        ctx.fillText(cfg.theme, x + 24, itemY);
       });
     }
 

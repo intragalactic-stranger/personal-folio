@@ -66,7 +66,7 @@ export class TerminalWindow {
 
   private setupEvents(): void {
     // Nav buttons open the terminal directly to that tab
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
+    document.querySelectorAll(".nav-btn[data-tab]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const tab = (btn as HTMLElement).dataset.tab;
         if (tab) {
@@ -87,10 +87,10 @@ export class TerminalWindow {
       redDot.addEventListener("click", () => this.closeTerminal());
     }
 
-    // Floating Graph Universe Toggle button
-    const floatGraphBtn = document.getElementById("float-graph-view-btn");
-    if (floatGraphBtn) {
-      floatGraphBtn.addEventListener("click", () => {
+    // Top Navigation View Mode Toggle button
+    const navGraphToggleBtn = document.getElementById("nav-graph-toggle-btn");
+    if (navGraphToggleBtn) {
+      navGraphToggleBtn.addEventListener("click", () => {
         if (this.isTerminalOpen) {
           this.closeTerminal();
         } else {
@@ -100,7 +100,7 @@ export class TerminalWindow {
     }
 
     // Brand title click toggles terminal
-    const brand = document.querySelector(".brand-section");
+    const brand = document.getElementById("nav-brand-btn");
     if (brand) {
       brand.addEventListener("click", () => {
         if (this.isTerminalOpen) {
@@ -151,9 +151,9 @@ export class TerminalWindow {
     if (this.physicsEngine) {
       this.physicsEngine.setTerminalOpen(true);
     }
-    const floatBtn = document.getElementById("float-graph-view-btn");
-    if (floatBtn) {
-      floatBtn.innerHTML = "<span>⬡</span> VIEW_GRAPH_UNIVERSE";
+    const navGraphToggleBtn = document.getElementById("nav-graph-toggle-btn");
+    if (navGraphToggleBtn) {
+      navGraphToggleBtn.innerHTML = "<span>⬡</span> GRAPH_VIEW";
     }
 
     this.animateStatChips();
@@ -168,9 +168,9 @@ export class TerminalWindow {
     if (this.physicsEngine) {
       this.physicsEngine.setTerminalOpen(false);
     }
-    const floatBtn = document.getElementById("float-graph-view-btn");
-    if (floatBtn) {
-      floatBtn.innerHTML = "<span>⌨</span> OPEN_TERMINAL";
+    const navGraphToggleBtn = document.getElementById("nav-graph-toggle-btn");
+    if (navGraphToggleBtn) {
+      navGraphToggleBtn.innerHTML = "<span>⌨</span> TERMINAL_VIEW";
     }
   }
 
@@ -178,7 +178,7 @@ export class TerminalWindow {
     this.currentTab = tab;
 
     // Update nav active states
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
+    document.querySelectorAll(".nav-btn[data-tab]").forEach((btn) => {
       const bTab = (btn as HTMLElement).dataset.tab;
       btn.classList.toggle("active", bTab === tab);
     });
