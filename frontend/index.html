@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ganeshan Arumuganainar // AI Software Engineer</title>
+    <meta name="description" content="Personal portfolio and interactive landing site for Ganeshan Arumuganainar — AI Software Engineer (Agentic Systems, Evaluations & LLM Infrastructure). Built with terminal aesthetics, 60FPS particle physics, and hybrid AI assistant." />
+    
+    <!-- Google Fonts: JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Background Interactive Gravitational Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Retro CRT Scanline Shader Overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Top Monospace Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand-section" title="Toggle Terminal / Graph Universe">
+        <div class="status-dot"></div>
+        <span class="brand-title">GANESHAN_ARUMUGANAINAR</span>
+        <span class="brand-role">// AI_SOFTWARE_ENGINEER</span>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><button class="nav-btn active" data-tab="about">[01 // ABOUT]</button></li>
+          <li><button class="nav-btn" data-tab="projects">[02 // PROJECTS]</button></li>
+          <li><button class="nav-btn" data-tab="skills">[03 // SKILLS]</button></li>
+          <li><button class="nav-btn" data-tab="experience">[04 // EXPERIENCE]</button></li>
+          <li><button class="nav-btn" data-tab="contact">[05 // CONTACT]</button></li>
+          <li>
+            <a href="https://ganeshan.dev" target="_blank" class="cv-nav-btn" title="Download Ganeshan Arumuganainar CV">
+              <span>⬇</span> CV.PDF
+            </a>
+          </li>
+          <li>
+            <button class="assistant-toggle-btn" id="nav-assistant-btn">
+              <span>&gt;_&lt;</span> AI_ASSISTANT
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Floating Graph Universe / Terminal Toggle Button -->
+    <button class="graph-universe-toggle" id="float-graph-view-btn" title="Toggle between Full Graph Universe and Terminal Inspector">
+      <span>⌨</span> OPEN_TERMINAL
+    </button>
+
+    <!-- Main Container -->
+    <main class="app-container">
+      <div id="terminal-window-container"></div>
+    </main>
+
+    <!-- Dockable Terminal AI Assistant Window -->
+    <div id="chat-dock-container"></div>
+
+    <!-- Application Script -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
