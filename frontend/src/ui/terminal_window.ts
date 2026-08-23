@@ -99,6 +99,14 @@ export class TerminalWindow {
       });
     }
 
+    // Compact Floating Open Terminal button below legend
+    const floatOpenBtn = document.getElementById("float-open-terminal-btn");
+    if (floatOpenBtn) {
+      floatOpenBtn.addEventListener("click", () => {
+        this.openTerminal();
+      });
+    }
+
     // Brand title click toggles terminal
     const brand = document.getElementById("nav-brand-btn");
     if (brand) {
@@ -156,6 +164,12 @@ export class TerminalWindow {
       navGraphToggleBtn.innerHTML = "<span>⬡</span> GRAPH_VIEW";
     }
 
+    // Hide the floating bottom-left button when terminal is open
+    const floatOpenBtn = document.getElementById("float-open-terminal-btn");
+    if (floatOpenBtn) {
+      floatOpenBtn.style.display = "none";
+    }
+
     this.animateStatChips();
   }
 
@@ -171,6 +185,12 @@ export class TerminalWindow {
     const navGraphToggleBtn = document.getElementById("nav-graph-toggle-btn");
     if (navGraphToggleBtn) {
       navGraphToggleBtn.innerHTML = "<span>⌨</span> TERMINAL_VIEW";
+    }
+
+    // Show the compact floating bottom-left button on canvas
+    const floatOpenBtn = document.getElementById("float-open-terminal-btn");
+    if (floatOpenBtn) {
+      floatOpenBtn.style.display = "inline-flex";
     }
   }
 

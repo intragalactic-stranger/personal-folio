@@ -115,9 +115,9 @@ export class CanvasRenderer {
 
     // 4. Interactive Callout below central node
     if (!isTerminalOpen) {
-      const hintY = center.y + radius + 22;
+      const hintY = center.y + radius + 20;
       const hintText = "[ ✦ CLICK NODE TO OPEN TERMINAL ]";
-      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.font = "bold 9.5px 'JetBrains Mono', monospace";
       ctx.fillStyle = `rgba(0, 204, 204, ${0.7 + pulse * 0.3})`;
       ctx.shadowColor = "#00cccc";
       ctx.shadowBlur = 8;
@@ -367,8 +367,8 @@ export class CanvasRenderer {
   public drawLegendOverlay(_width: number, height: number, isCollapsed: boolean): void {
     const ctx = this.ctx;
     const x = 20;
-    const y = height - (isCollapsed ? 38 : 160);
-    const w = isCollapsed ? 145 : 240;
+    const y = height - (isCollapsed ? 76 : 196);
+    const w = 220;
     const h = isCollapsed ? 26 : 145;
 
     ctx.save();
@@ -387,7 +387,7 @@ export class CanvasRenderer {
     // Header
     ctx.font = "bold 10px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00cccc";
-    ctx.fillText(`⬡ LEGEND [${isCollapsed ? "+" : "—"}]`, x + 10, y + 13);
+    ctx.fillText(`⬡ GRAPH LEGEND [${isCollapsed ? "+" : "—"}]`, x + 10, y + 13);
 
     if (!isCollapsed) {
       ctx.font = "9px 'JetBrains Mono', monospace";

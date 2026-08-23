@@ -157,6 +157,37 @@
   box-shadow: var(--glow-cyan);
 }
 
+/* Compact Floating Open Terminal Button (Directly below legend) */
+.graph-open-terminal-btn {
+  position: fixed;
+  bottom: 18px;
+  left: 20px;
+  width: 220px;
+  justify-content: center;
+  background: rgba(8, 12, 18, 0.94);
+  border: 1px solid var(--color-blue-primary);
+  color: var(--color-blue-primary);
+  padding: 0.38rem 0.85rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 4px;
+  backdrop-filter: blur(14px);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  box-shadow: 0 0 12px rgba(0, 204, 204, 0.25);
+  transition: all 0.2s ease;
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+
+.graph-open-terminal-btn:hover {
+  background: var(--color-blue-primary);
+  color: #080b10;
+  box-shadow: var(--glow-cyan);
+}
+
 /* App Container */
 .app-container {
   position: relative;
