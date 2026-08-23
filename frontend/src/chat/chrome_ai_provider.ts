@@ -31,36 +31,28 @@ declare global {
 export class ChromeAiProvider implements AiProvider {
   public name = "Chrome Gemini Nano";
   private session: ChromeAiSession | null = null;
-  private hasNativeSupport = false;
 
   public async isAvailable(): Promise<boolean> {
     if (typeof window === "undefined") return false;
 
-    // Check standard Chrome Prompt API
+    // Strict native check for Safari / Firefox / non-flag Chrome
     if (window.ai?.languageModel) {
       try {
         const caps = await window.ai.languageModel.capabilities();
-        if (caps.available === "readily" || caps.available === "after-download") {
-          this.hasNativeSupport = true;
-          return true;
-        }
+        return caps.available === "readily" || caps.available === "after-download";
       } catch {
-        // Continue to check other variants
+        return false;
       }
     }
 
-    // Check legacy / Canary origin trial namespaces
-    if (typeof window.ai?.createTextSession === "function" || typeof window.model?.createTextSession === "function") {
-      this.hasNativeSupport = true;
+    if (
+      typeof window.ai?.createTextSession === "function" ||
+      typeof window.model?.createTextSession === "function"
+    ) {
       return true;
     }
 
-    // Client-side Gemini Nano simulation engine
-    return true;
-  }
-
-  public getIsNative(): boolean {
-    return this.hasNativeSupport;
+    return false;
   }
 
   public async streamChat(
@@ -70,44 +62,40 @@ export class ChromeAiProvider implements AiProvider {
   ): Promise<void> {
     const lastUserMessage = messages[messages.length - 1]?.content || "";
 
-    // 1. Try native Chrome Built-in LanguageModel session
+    // 1. Native Chrome Gemini Nano Prompt API
     if (window.ai?.languageModel) {
-      try {
-        if (!this.session) {
-          this.session = await window.ai.languageModel.create({
-            systemPrompt:
-              "You are the personal AI Assistant for Ganeshan Arumuganainar, AI Software Engineer. " +
-              "Answer questions about Ganeshan's background, agentic systems, Celery evaluation sidecars, and Graph RAG.",
-          });
-        }
+      if (!this.session) {
+        this.session = await window.ai.languageModel.create({
+          systemPrompt:
+            "You are the personal AI Assistant for Ganeshan Arumuganainar, AI Software Engineer. " +
+            "Answer questions about Ganeshan's background, agentic systems, Celery evaluation sidecars, and Graph RAG.",
+        });
+      }
 
-        const stream = this.session.promptStreaming(lastUserMessage);
-        let previousLength = 0;
+      const stream = this.session.promptStreaming(lastUserMessage);
+      let previousLength = 0;
 
-        for await (const cumulativeChunk of stream) {
-          if (signal?.aborted) break;
-          const delta = cumulativeChunk.slice(previousLength);
-          previousLength = cumulativeChunk.length;
-
-          onChunk({
-            delta,
-            done: false,
-            provider: "chrome-gemini-nano (native)",
-          });
-        }
+      for await (const cumulativeChunk of stream) {
+        if (signal?.aborted) break;
+        const delta = cumulativeChunk.slice(previousLength);
+        previousLength = cumulativeChunk.length;
 
         onChunk({
-          delta: "",
-          done: true,
-          provider: "chrome-gemini-nano (native)",
+          delta,
+          done: false,
+          provider: "chrome-gemini-nano",
         });
-        return;
-      } catch (e) {
-        console.warn("Native Chrome Prompt API session error, using client-side Gemini engine:", e);
       }
+
+      onChunk({
+        delta: "",
+        done: true,
+        provider: "chrome-gemini-nano",
+      });
+      return;
     }
 
-    // 2. High-Fidelity Client-Side Gemini Nano Engine
+    // 2. Client-side local engine fallback
     const responseText = PersonaService.generateResponse(lastUserMessage);
     const words = responseText.split(" ");
 
@@ -117,15 +105,15 @@ export class ChromeAiProvider implements AiProvider {
       onChunk({
         delta: chunk,
         done: false,
-        provider: "chrome-gemini-nano",
+        provider: "chrome-gemini-nano (local)",
       });
-      await new Promise((resolve) => setTimeout(resolve, 22));
+      await new Promise((resolve) => setTimeout(resolve, 20));
     }
 
     onChunk({
       delta: "",
       done: true,
-      provider: "chrome-gemini-nano",
+      provider: "chrome-gemini-nano (local)",
     });
   }
 }

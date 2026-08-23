@@ -41,15 +41,16 @@ export class TerminalWindow {
           </div>
           <div class="terminal-title">ganeshan@ai-node: ~/${this.currentTab}</div>
           <div class="terminal-actions">
-            <button class="nav-btn" id="btn-close-to-graph" style="padding: 2px 8px; font-size: 0.7rem;">⬡ GRAPH_VIEW</button>
+            <button class="nav-btn" id="btn-close-to-graph" style="padding: 2px 8px; font-size: 0.72rem;">⬡ GRAPH_VIEW</button>
             <div class="terminal-badge">SYS_ACTIVE</div>
           </div>
         </div>
 
         <div class="terminal-body" id="terminal-body">
           <div class="banner-container">
-            <div class="ascii-banner">${ContentSections.getAsciiBanner()}</div>
+            <div class="ascii-banner" id="hero-ascii-banner">${ContentSections.getAsciiBanner()}</div>
             <div class="banner-subtitle">[ AI SOFTWARE ENGINEER // AGENTIC SYSTEMS // EVALS &amp; LLM INFRASTRUCTURE ]</div>
+            ${ContentSections.getStatChips()}
           </div>
           ${ContentSections.getMetaGrid()}
           <div id="dynamic-content"></div>
@@ -57,14 +58,14 @@ export class TerminalWindow {
 
         <div class="terminal-cli-bar">
           <span class="cli-prompt">ganeshan@ai-node:~$</span>
-          <input type="text" class="cli-input" id="terminal-cli-input" placeholder="Type a command (e.g. 'projects', 'skills', 'chat', 'help')..." autocomplete="off" />
+          <input type="text" class="cli-input" id="terminal-cli-input" placeholder="Type a command (e.g. 'projects', 'skills', 'experience', 'chat', 'help')..." autocomplete="off" />
         </div>
       </div>
     `;
   }
 
   private setupEvents(): void {
-    // Nav buttons open the terminal to that specific tab
+    // Nav buttons
     document.querySelectorAll(".nav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const tab = (btn as HTMLElement).dataset.tab;
@@ -98,7 +99,7 @@ export class TerminalWindow {
       });
     }
 
-    // Top Brand title click opens/toggles terminal
+    // Brand title click toggles terminal
     const brand = document.querySelector(".brand-section");
     if (brand) {
       brand.addEventListener("click", () => {
@@ -110,7 +111,7 @@ export class TerminalWindow {
       });
     }
 
-    // Pressing any key while on graph view opens the terminal
+    // Pressing any key opens terminal if closed
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!this.isTerminalOpen && e.key !== "Tab" && e.key !== "Escape") {
         this.openTerminal();
@@ -165,6 +166,8 @@ export class TerminalWindow {
     if (floatBtn) {
       floatBtn.innerHTML = "<span>⬡</span> VIEW_GRAPH_UNIVERSE";
     }
+
+    this.animateStatChips();
   }
 
   public closeTerminal(): void {
@@ -191,7 +194,6 @@ export class TerminalWindow {
       btn.classList.toggle("active", bTab === tab);
     });
 
-    // Update window header title
     const title = this.container.querySelector(".terminal-title");
     if (title) {
       title.textContent = `ganeshan@ai-node: ~/${tab}`;
@@ -209,9 +211,11 @@ export class TerminalWindow {
         break;
       case "skills":
         dynamicContent.innerHTML = ContentSections.renderSkills();
+        this.setupSkillRadialAnimations();
         break;
       case "experience":
         dynamicContent.innerHTML = ContentSections.renderExperience();
+        this.setupExperienceAnimations();
         break;
       case "contact":
         dynamicContent.innerHTML = ContentSections.renderContact();
@@ -219,6 +223,76 @@ export class TerminalWindow {
         break;
       default:
         dynamicContent.innerHTML = ContentSections.renderAbout();
+    }
+  }
+
+  private animateStatChips(): void {
+    const chips = this.container.querySelectorAll(".chip-num");
+    chips.forEach((el) => {
+      const targetStr = (el as HTMLElement).dataset.target || "0";
+      const suffix = (el as HTMLElement).dataset.suffix || "";
+      const target = parseInt(targetStr, 10);
+      if (isNaN(target)) return;
+
+      let start = 0;
+      const duration = 1000;
+      const startTime = performance.now();
+
+      const update = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (target - start) * eased);
+        el.textContent = (target > 1000 ? `${Math.floor(current / 1000)}K` : current.toString()) + suffix;
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      };
+      requestAnimationFrame(update);
+    });
+  }
+
+  private setupSkillRadialAnimations(): void {
+    const ringBox = this.container.querySelector("#skills-rings");
+    if (!ringBox) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.querySelectorAll(".ring-progress").forEach((ring) => {
+              const targetOffset = (ring as HTMLElement).dataset.targetOffset;
+              if (targetOffset) {
+                (ring as HTMLElement).style.strokeDashoffset = targetOffset;
+              }
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(ringBox);
+  }
+
+  private setupExperienceAnimations(): void {
+    const evalsCount = this.container.querySelector("#evals-count");
+    if (evalsCount) {
+      let start = 0;
+      const target = 25000;
+      const duration = 1200;
+      const startTime = performance.now();
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const cur = Math.floor(start + (target - start) * eased);
+        evalsCount.textContent = `${Math.floor(cur / 1000)}K`;
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     }
   }
 
@@ -231,20 +305,54 @@ export class TerminalWindow {
 
     form.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
-      const name = (form.querySelector("#c-name") as HTMLInputElement).value;
-      const email = (form.querySelector("#c-email") as HTMLInputElement).value;
-      const subject = (form.querySelector("#c-subject") as HTMLInputElement).value;
-      const message = (form.querySelector("#c-message") as HTMLTextAreaElement).value;
+
+      // Clear existing errors
+      ["err-c-name", "err-c-email", "err-c-message"].forEach((id) => {
+        const errEl = this.container.querySelector(`#${id}`);
+        if (errEl) errEl.textContent = "";
+      });
+
+      const nameInput = form.querySelector("#c-name") as HTMLInputElement;
+      const emailInput = form.querySelector("#c-email") as HTMLInputElement;
+      const subjectInput = form.querySelector("#c-subject") as HTMLInputElement;
+      const messageInput = form.querySelector("#c-message") as HTMLTextAreaElement;
+
+      let hasError = false;
+
+      if (!nameInput.value.trim()) {
+        const errEl = this.container.querySelector("#err-c-name");
+        if (errEl) errEl.textContent = 'ERROR: field.required → "identity/name"';
+        hasError = true;
+      }
+
+      if (!emailInput.value.trim() || !emailInput.value.includes("@")) {
+        const errEl = this.container.querySelector("#err-c-email");
+        if (errEl) errEl.textContent = 'ERROR: invalid.format → "contact.email must include @"';
+        hasError = true;
+      }
+
+      if (!messageInput.value.trim()) {
+        const errEl = this.container.querySelector("#err-c-message");
+        if (errEl) errEl.textContent = 'ERROR: field.required → "transmission.message"';
+        hasError = true;
+      }
+
+      if (hasError) return;
 
       submitBtn.disabled = true;
-      submitBtn.textContent = "TRANSMITTING...";
-      statusMsg.innerHTML = '<span style="color: var(--color-blue-primary);">Transmitting packet to server...</span>';
+      submitBtn.textContent = "TRANSMITTING PACKET...";
+      statusMsg.innerHTML = '<span style="color: var(--color-blue-primary);">Transmitting telemetry packet to server...</span>';
 
       try {
         const res = await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, subject, message }),
+          body: JSON.stringify({
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim(),
+            subject: subjectInput.value.trim(),
+            message: messageInput.value.trim(),
+          }),
         });
 
         if (res.ok) {
@@ -252,7 +360,7 @@ export class TerminalWindow {
           statusMsg.innerHTML = `<span style="color: var(--color-status-green);">✔ [200 OK] ${data.message}</span>`;
           form.reset();
         } else {
-          statusMsg.innerHTML = '<span style="color: var(--color-status-red);">✖ [ERROR] Transmission failed. Please reach via ganeshanarumuganainar@gmail.com</span>';
+          statusMsg.innerHTML = '<span style="color: var(--color-status-red);">✖ [ERROR] Transmission failed. Please reach directly via ganeshanarumuganainar@gmail.com</span>';
         }
       } catch {
         statusMsg.innerHTML = '<span style="color: var(--color-status-red);">✖ [OFFLINE] Network unreachable. Please contact directly via ganeshanarumuganainar@gmail.com</span>';

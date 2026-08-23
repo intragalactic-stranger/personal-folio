@@ -1,7 +1,14 @@
 import { Starfield } from "../physics/starfield";
 import { Cluster } from "../physics/cluster";
+import { Particle } from "../physics/particle";
 import { Vector2D } from "../physics/vector2d";
-import { SPINNER_FRAMES } from "./ascii_glyphs";
+import { SPINNER_FRAMES, TECH_CLUSTERS_CONFIG } from "./ascii_glyphs";
+
+export interface SelectedNodeInfo {
+  particle: Particle;
+  clusterTheme: string;
+  category: string;
+}
 
 export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -28,8 +35,8 @@ export class CanvasRenderer {
       const clampedAlpha = Math.max(0.05, Math.min(1.0, alpha));
 
       if (star.isSpinner) {
-        ctx.fillStyle = `rgba(56, 189, 248, ${clampedAlpha})`;
-        ctx.shadowColor = "rgba(56, 189, 248, 0.6)";
+        ctx.fillStyle = `rgba(0, 204, 204, ${clampedAlpha})`;
+        ctx.shadowColor = "rgba(0, 204, 204, 0.6)";
         ctx.shadowBlur = 4;
       } else {
         ctx.fillStyle = `rgba(148, 163, 184, ${clampedAlpha * 0.7})`;
@@ -44,13 +51,13 @@ export class CanvasRenderer {
   public drawCentralNode(center: Vector2D, isTerminalOpen: boolean): void {
     const ctx = this.ctx;
     const pulse = (Math.sin(this.pulseTimer) + 1) / 2; // 0 to 1
-    const radius = 72;
+    const radius = 74;
 
     ctx.save();
 
     // 1. Outer cybernetic pulsing ring
     const ringRadius = radius + 10 + pulse * 6;
-    ctx.strokeStyle = `rgba(56, 189, 248, ${0.25 + pulse * 0.25})`;
+    ctx.strokeStyle = `rgba(0, 204, 204, ${0.25 + pulse * 0.25})`;
     ctx.lineWidth = 1.2;
     ctx.setLineDash([6, 6]);
     ctx.beginPath();
@@ -66,14 +73,14 @@ export class CanvasRenderer {
       center.y,
       radius
     );
-    grad.addColorStop(0, "rgba(14, 22, 34, 0.95)");
-    grad.addColorStop(0.75, "rgba(10, 15, 23, 0.92)");
-    grad.addColorStop(1, "rgba(56, 189, 248, 0.35)");
+    grad.addColorStop(0, "rgba(10, 18, 28, 0.95)");
+    grad.addColorStop(0.75, "rgba(8, 14, 22, 0.92)");
+    grad.addColorStop(1, "rgba(0, 204, 204, 0.35)");
 
     ctx.fillStyle = grad;
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.85)";
+    ctx.strokeStyle = "rgba(0, 204, 204, 0.85)";
     ctx.lineWidth = 2;
-    ctx.shadowColor = "#38bdf8";
+    ctx.shadowColor = "#00cccc";
     ctx.shadowBlur = 16 + pulse * 8;
     ctx.setLineDash([]);
     ctx.beginPath();
@@ -85,7 +92,7 @@ export class CanvasRenderer {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Top icon / status
+    // Status indicator
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#4ade80";
     ctx.shadowColor = "#4ade80";
@@ -94,25 +101,25 @@ export class CanvasRenderer {
 
     // Big Name
     ctx.font = "bold 13px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowColor = "#38bdf8";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+    ctx.shadowColor = "#00cccc";
     ctx.shadowBlur = 10;
     ctx.fillText("GANESHAN", center.x, center.y - 12);
     ctx.fillText("ARUMUGANAINAR", center.x, center.y + 6);
 
-    // Tag
+    // Headline tag
     ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#38bdf8";
+    ctx.fillStyle = "#00cccc";
     ctx.shadowBlur = 4;
-    ctx.fillText("SYSTEMS & EVALUATIONS", center.x, center.y + 26);
+    ctx.fillText("SYSTEMS & EVALS", center.x, center.y + 26);
 
     // 4. Interactive Callout below central node (when terminal is closed)
     if (!isTerminalOpen) {
       const hintY = center.y + radius + 28;
       const hintText = "[ ✦ CLICK NODE OR PRESS ANY KEY TO OPEN TERMINAL ]";
       ctx.font = "bold 10px 'JetBrains Mono', monospace";
-      ctx.fillStyle = `rgba(56, 189, 248, ${0.7 + pulse * 0.3})`;
-      ctx.shadowColor = "#38bdf8";
+      ctx.fillStyle = `rgba(0, 204, 204, ${0.7 + pulse * 0.3})`;
+      ctx.shadowColor = "#00cccc";
       ctx.shadowBlur = 8;
       ctx.fillText(hintText, center.x, hintY);
     }
@@ -120,10 +127,17 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
-  public drawClusters(clusters: Cluster[], centerNode: Vector2D): void {
+  public drawClusters(
+    clusters: Cluster[],
+    centerNode: Vector2D,
+    hoveredCluster: Cluster | null,
+    selectedNode: SelectedNodeInfo | null
+  ): void {
     const ctx = this.ctx;
 
     for (const cluster of clusters) {
+      const isHovered = hoveredCluster?.id === cluster.id;
+
       // 1. Draw Master Constellation Trunk from Center Node to Cluster
       ctx.save();
       const trunkGrad = ctx.createLinearGradient(
@@ -132,12 +146,12 @@ export class CanvasRenderer {
         cluster.center.x,
         cluster.center.y
       );
-      trunkGrad.addColorStop(0, "rgba(56, 189, 248, 0.45)");
-      trunkGrad.addColorStop(0.5, "rgba(56, 189, 248, 0.2)");
-      trunkGrad.addColorStop(1, "rgba(88, 166, 255, 0.35)");
+      trunkGrad.addColorStop(0, "rgba(0, 204, 204, 0.45)");
+      trunkGrad.addColorStop(0.5, "rgba(0, 204, 204, 0.2)");
+      trunkGrad.addColorStop(1, cluster.color);
 
       ctx.strokeStyle = trunkGrad;
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = isHovered ? 2.0 : 1.2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(centerNode.x, centerNode.y);
@@ -145,18 +159,30 @@ export class CanvasRenderer {
       ctx.stroke();
       ctx.restore();
 
-      // 2. Draw cluster title badge at centroid
+      // 2. Draw cluster title badge at centroid in a dark pill background
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "bold 9px 'JetBrains Mono', monospace";
-      ctx.fillStyle = "rgba(56, 189, 248, 0.75)";
-      ctx.shadowColor = "rgba(56, 189, 248, 0.5)";
-      ctx.shadowBlur = 6;
-      ctx.fillText(`⬡ ${cluster.themeTitle}`, cluster.center.x, cluster.center.y - cluster.radius - 12);
+      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      const titleText = `⬡ ${cluster.themeTitle}`;
+      const titleWidth = ctx.measureText(titleText).width;
+      const titleY = cluster.center.y - cluster.radius - 14;
+
+      ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
+      ctx.strokeStyle = isHovered ? "rgba(0, 204, 204, 0.8)" : "rgba(0, 204, 204, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(cluster.center.x - titleWidth / 2 - 8, titleY - 10, titleWidth + 16, 20, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = isHovered ? "#ffffff" : "rgba(0, 204, 204, 0.85)";
+      ctx.shadowColor = "#00cccc";
+      ctx.shadowBlur = isHovered ? 8 : 4;
+      ctx.fillText(titleText, cluster.center.x, titleY);
       ctx.restore();
 
-      // 3. Draw inter-particle constellation lines within cluster
+      // 3. Draw inter-particle constellation lines within cluster (increased visibility ~0.25)
       ctx.save();
       const pLen = cluster.particles.length;
       for (let i = 0; i < pLen; i++) {
@@ -164,12 +190,12 @@ export class CanvasRenderer {
         for (let j = i + 1; j < pLen; j++) {
           const p2 = cluster.particles[j];
           const distSq = (p1.pos.x - p2.pos.x) ** 2 + (p1.pos.y - p2.pos.y) ** 2;
-          const maxDist = 70;
+          const maxDist = 75;
           if (distSq < maxDist * maxDist) {
             const dist = Math.sqrt(distSq);
-            const lineAlpha = (1 - dist / maxDist) * 0.26;
-            ctx.strokeStyle = `rgba(56, 189, 248, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
+            const lineAlpha = (1 - dist / maxDist) * 0.28;
+            ctx.strokeStyle = `rgba(0, 204, 204, ${lineAlpha})`;
+            ctx.lineWidth = (p1.type === "label" && p2.type === "label") ? 1.0 : 0.7;
             ctx.beginPath();
             ctx.moveTo(p1.pos.x, p1.pos.y);
             ctx.lineTo(p2.pos.x, p2.pos.y);
@@ -179,22 +205,21 @@ export class CanvasRenderer {
       }
       ctx.restore();
 
-      // 4. Draw particles & technology labels
+      // 4. Draw particles & technology labels (guarded against undefined)
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       for (const p of cluster.particles) {
-        if (p.type === "label" && p.label && p.label.trim()) {
-          // Draw neat glowing technology tag
+        if (p.type === "label" && p.label && p.label !== "undefined" && p.label.trim()) {
           ctx.font = "10px 'JetBrains Mono', monospace";
           const textWidth = ctx.measureText(p.label).width;
-          const paddingX = 5;
-          const height = 16;
+          const paddingX = 6;
+          const height = 18;
 
-          ctx.fillStyle = "rgba(8, 12, 18, 0.85)";
-          ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
-          ctx.lineWidth = 1;
+          ctx.fillStyle = "rgba(6, 10, 16, 0.88)";
+          ctx.strokeStyle = p.isHovered ? "#00cccc" : "rgba(0, 204, 204, 0.45)";
+          ctx.lineWidth = p.isHovered ? 1.5 : 1;
           ctx.beginPath();
           ctx.roundRect(
             p.pos.x - textWidth / 2 - paddingX,
@@ -206,9 +231,9 @@ export class CanvasRenderer {
           ctx.fill();
           ctx.stroke();
 
-          ctx.fillStyle = "#f1f5f9";
-          ctx.shadowColor = "#38bdf8";
-          ctx.shadowBlur = 6;
+          ctx.fillStyle = p.isHovered ? "#ffffff" : "rgba(255, 255, 255, 0.88)";
+          ctx.shadowColor = "#00cccc";
+          ctx.shadowBlur = p.isHovered ? 8 : 4;
           ctx.fillText(p.label, p.pos.x, p.pos.y);
         } else if (p.type === "spinner") {
           const frame = SPINNER_FRAMES[Math.floor(p.rotation * 4) % SPINNER_FRAMES.length];
@@ -229,6 +254,134 @@ export class CanvasRenderer {
       }
       ctx.restore();
     }
+
+    // 5. Draw Cluster Zone Hover Stat Card
+    if (hoveredCluster) {
+      this.drawClusterHoverCard(hoveredCluster);
+    }
+
+    // 6. Draw Selected Node Click Tooltip Card
+    if (selectedNode) {
+      this.drawNodeTooltip(selectedNode);
+    }
+  }
+
+  private drawClusterHoverCard(cluster: Cluster): void {
+    const ctx = this.ctx;
+    const x = cluster.center.x;
+    const y = cluster.center.y + cluster.radius + 24;
+    const width = 280;
+    const height = 48;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(8, 12, 18, 0.95)";
+    ctx.strokeStyle = "#00cccc";
+    ctx.lineWidth = 1.2;
+    ctx.shadowColor = "#00cccc";
+    ctx.shadowBlur = 12;
+
+    ctx.beginPath();
+    ctx.roundRect(x - width / 2, y, width, height, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.font = "bold 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#00cccc";
+    ctx.fillText(`⬡ ${cluster.meta.zoneCode}`, x, y + 16);
+
+    ctx.font = "10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.fillText(cluster.meta.summary, x, y + 32);
+
+    ctx.restore();
+  }
+
+  private drawNodeTooltip(info: SelectedNodeInfo): void {
+    const ctx = this.ctx;
+    const p = info.particle;
+    const x = p.pos.x;
+    const y = p.pos.y - 45;
+    const width = 220;
+    const height = 52;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(6, 10, 16, 0.96)";
+    ctx.strokeStyle = "#00cccc";
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = "#00cccc";
+    ctx.shadowBlur = 14;
+
+    ctx.beginPath();
+    ctx.roundRect(x - width / 2, y - height, width, height, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    // Triangle notch
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y);
+    ctx.lineTo(x + 6, y);
+    ctx.lineTo(x, y + 6);
+    ctx.closePath();
+    ctx.fillStyle = "#00cccc";
+    ctx.fill();
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.font = "bold 11px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(`NODE: ${p.label || "SYSTEM_PARTICLE"}`, x, y - height + 16);
+
+    ctx.font = "9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#00cccc";
+    ctx.fillText(`ZONE: ${info.clusterTheme}`, x, y - height + 34);
+
+    ctx.restore();
+  }
+
+  public drawLegendOverlay(_width: number, height: number, isCollapsed: boolean): void {
+    const ctx = this.ctx;
+    const x = 24;
+    const y = height - (isCollapsed ? 48 : 175);
+    const w = 260;
+    const h = isCollapsed ? 32 : 155;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
+    ctx.strokeStyle = "rgba(0, 204, 204, 0.35)";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+
+    // Header
+    ctx.font = "bold 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#00cccc";
+    ctx.fillText(`⬡ GRAPH LEGEND [${isCollapsed ? "+" : "—"}]`, x + 12, y + 16);
+
+    if (!isCollapsed) {
+      ctx.font = "9px 'JetBrains Mono', monospace";
+      TECH_CLUSTERS_CONFIG.forEach((cfg, i) => {
+        const itemY = y + 42 + i * 22;
+        ctx.fillStyle = cfg.color;
+        ctx.beginPath();
+        ctx.arc(x + 16, itemY, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.fillText(cfg.theme, x + 26, itemY);
+      });
+    }
+
+    ctx.restore();
   }
 
   public drawCursorField(mousePos: Vector2D | null, radius: number): void {
@@ -243,9 +396,9 @@ export class CanvasRenderer {
       mousePos.y,
       radius
     );
-    grad.addColorStop(0, "rgba(56, 189, 248, 0.14)");
-    grad.addColorStop(0.7, "rgba(56, 189, 248, 0.03)");
-    grad.addColorStop(1, "rgba(56, 189, 248, 0)");
+    grad.addColorStop(0, "rgba(0, 204, 204, 0.14)");
+    grad.addColorStop(0.7, "rgba(0, 204, 204, 0.03)");
+    grad.addColorStop(1, "rgba(0, 204, 204, 0)");
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(mousePos.x, mousePos.y, radius, 0, Math.PI * 2);

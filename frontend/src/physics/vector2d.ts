@@ -83,4 +83,13 @@ export class Vector2D {
   public static sub(v1: Vector2D, v2: Vector2D): Vector2D {
     return new Vector2D(v1.x - v2.x, v1.y - v2.y);
   }
+
+  public static mult(v: Vector2D, n: number): Vector2D {
+    return new Vector2D(v.x * n, v.y * n);
+  }
+
+  public static div(v: Vector2D, n: number): Vector2D {
+    if (n === 0) return new Vector2D(v.x, v.y);
+    return new Vector2D(v.x / n, v.y / n);
+  }
 }

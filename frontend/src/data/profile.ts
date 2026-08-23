@@ -1,185 +1,88 @@
-/**
- * Portfolio profile content for Ganeshan Arumuganainar — AI Software Engineer.
- * Grounded in verified CV experience, projects, skills, and certifications.
- */
-
-export interface Project {
+export interface ProjectItem {
   id: string;
   title: string;
-  category: string;
+  category: "AUTONOMOUS SYSTEMS" | "GRAPH AI" | "LLM INFRASTRUCTURE" | "ML PLATFORMS";
+  categoryColor: string; // amber, teal, blue, emerald
   description: string;
-  stack: string[];
   metrics: string;
+  stack: string[];
+  archIcon: string;
   githubUrl: string;
   liveUrl: string;
 }
 
-export interface SkillCategory {
+export interface SkillRadial {
+  name: string;
+  shortName: string;
+  pct: number;
+  color: string;
   category: string;
-  skills: string[];
+  detail: string;
 }
 
-export interface ExperienceItem {
-  period: string;
-  role: string;
-  company: string;
-  location: string;
-  summary?: string;
-  highlights: string[];
-}
-
-export interface Certification {
+export interface CertificationItem {
   title: string;
   issuer: string;
   tag: string;
-}
-
-export interface EducationItem {
-  degree: string;
-  institution: string;
+  tint: "teal" | "green" | "purple" | "blue";
   year: string;
-  grade: string;
 }
 
 export interface ProfileData {
   name: string;
-  role: string;
   headline: string;
-  tagline: string;
   nodeLocation: string;
   status: string;
   phone: string;
-  bio: string[];
-  projects: Project[];
-  skillCategories: SkillCategory[];
-  experience: ExperienceItem[];
-  certifications: Certification[];
-  education: EducationItem[];
-  achievements: string[];
   socials: {
+    email: string;
     github: string;
     linkedin: string;
-    email: string;
     website: string;
   };
+  bio: string[];
+  education: Array<{
+    degree: string;
+    institution: string;
+    year: string;
+    grade: string;
+  }>;
+  achievements: string[];
+  skillRadials: SkillRadial[];
+  skillCategories: Array<{
+    category: string;
+    skills: string[];
+  }>;
+  activeLearning: Array<{
+    title: string;
+    status: string;
+  }>;
+  projects: ProjectItem[];
+  certifications: CertificationItem[];
 }
 
 export const PROFILE_DATA: ProfileData = {
   name: "Ganeshan Arumuganainar",
-  role: "AI Software Engineer",
-  headline: "Agentic Systems, Evaluations & LLM Infrastructure",
-  tagline: "Engineering production-reliable multi-agent systems, evaluation sidecars, and hybrid graph retrieval pipelines deployed on Kubernetes.",
+  headline: "AI Software Engineer // Agentic Systems, Evals & LLM Infrastructure",
   nodeLocation: "MUMBAI, INDIA // ASIA-SOUTH1",
   status: "ONLINE // DELIVERING PRODUCTION AI",
   phone: "+91 8169956401",
+  socials: {
+    email: "ganeshanarumuganainar@gmail.com",
+    github: "https://github.com/intragalactic-stranger",
+    linkedin: "https://linkedin.com/in/ganeshannainar",
+    website: "https://ganeshan.dev",
+  },
   bio: [
     "AI Software Engineer (2+ yrs, promoted within 18 months) focused on making LLM agents reliable in production evaluations, guardrails, and observability.",
     "Build LangGraph-based multi-agent systems and hybrid/graph retrieval pipelines, deployed on Kubernetes across AWS, GCP, and on-premise.",
     "Own systems end-to-end: architecture, build, deployment, and client handover. Delivered 7 production systems for 6 clients across BFSI, retail, healthcare, and logistics.",
   ],
-  projects: [
-    {
-      id: "retail-intelligence",
-      title: "Autonomous Retail Intelligence & Dynamic Promotion System",
-      category: "Autonomous Systems // Forecasting & Pricing",
-      description: "Agentic forecasting and dynamic pricing system combining Temporal Fusion Transformer (TFT) demand forecasting (13% WAPE across 2,400 SKUs) and XGBoost/MLP pricing model (R² 0.94, MAE 4.1% of list price). Integrated LLM reasoning agents validating price recommendations against 10+ market signals.",
-      stack: ["LangGraph", "Temporal Fusion Transformer", "XGBoost", "MLP", "Gemini", "MLflow"],
-      metrics: "Turnaround cut from ~2 days to <15 min, 13% WAPE",
-      githubUrl: "https://github.com/intragalactic-stranger",
-      liveUrl: "https://ganeshan.dev",
-    },
-    {
-      id: "graph-rag",
-      title: "Graph RAG for Hyper-Personalized Product Recommendations",
-      category: "Graph AI // Hybrid Retrieval",
-      description: "Modeled 180K customers and 25K products as a 1.2M-node / 4.8M-edge Neo4j knowledge graph to enable multi-hop reasoning. Combined graph traversal with dense vector retrieval in a hybrid pipeline evaluated with RAGAS.",
-      stack: ["Neo4j", "Vector Embeddings", "Hybrid Retrieval", "RAGAS", "FastAPI"],
-      metrics: "+43% NDCG@10 lift, 0.89 precision & 0.92 relevancy",
-      githubUrl: "https://github.com/intragalactic-stranger",
-      liveUrl: "https://ganeshan.dev",
-    },
-    {
-      id: "pi-agent-eval",
-      title: "Pi-Agent-IDP & Evaluation Sidecar",
-      category: "LLM Infrastructure // Observability & Guardrails",
-      description: "Celery-based evaluation sidecar with isolated per-tenant queues, scaling asynchronous agent scoring. Built core SDK and scoring modules for an on-premise agentic identity platform with PII and safety guardrail enforcement.",
-      stack: ["Python", "Celery", "Redis", "LangFuse", "Phoenix", "Kubernetes", "FastAPI"],
-      metrics: "~25K evals/day across 6 tenants, p95 latency < 9s",
-      githubUrl: "https://github.com/intragalactic-stranger",
-      liveUrl: "https://ganeshan.dev",
-    },
-    {
-      id: "genai-in-a-box",
-      title: "GenAI-in-a-Box & Multi-LLM LiteLLM Gateway",
-      category: "MLOps / LLMOps // Gateway Routing",
-      description: "Internal MLOps platform standardizing RAG and agent delivery across cloud and on-premise. Routed traffic across 4 LLM providers through a LiteLLM gateway with per-tenant fallbacks, budget limits, and quality gates.",
-      stack: ["LiteLLM", "FastAPI", "Kubernetes", "Helm", "Terraform", "AWS Bedrock", "GCP Vertex AI"],
-      metrics: "SDLC cut from 14w to 5w, 38% LLM cost reduction",
-      githubUrl: "https://github.com/intragalactic-stranger",
-      liveUrl: "https://ganeshan.dev",
-    },
-  ],
-  skillCategories: [
-    {
-      category: "01 // AGENTS & FRAMEWORKS",
-      skills: ["LangGraph", "LangChain", "LlamaIndex", "FastAPI", "MCP", "LiteLLM Gateway", "Claude SDK", "Google ADK", "Fine-Tuning"],
-    },
-    {
-      category: "02 // RETRIEVAL & VECTOR SEARCH",
-      skills: ["Hybrid RAG", "Graph RAG", "Document Intelligence", "Neo4j", "Pinecone", "FAISS", "Chroma", "OpenSearch", "pgvector"],
-    },
-    {
-      category: "03 // EVALUATIONS & GUARDRAILS",
-      skills: ["LangFuse", "Phoenix", "LangSmith", "RAGAS", "Giskard", "LLM Guardrails", "OpenTelemetry", "Datadog"],
-    },
-    {
-      category: "04 // CLOUD & INFRASTRUCTURE",
-      skills: ["AWS (Bedrock, SageMaker AI, ECS Fargate, EKS, Lambda)", "GCP Vertex AI", "Databricks", "Kubernetes", "Helm", "Terraform", "Docker", "Celery", "Redis", "PostgreSQL", "MongoDB", "CI/CD"],
-    },
-    {
-      category: "05 // LANGUAGES & MACHINE LEARNING",
-      skills: ["Python", "C++", "SQL", "TypeScript", "PyTorch", "TensorFlow", "scikit-learn", "NLP", "MLflow", "ZenML", "Evidently"],
-    },
-  ],
-  experience: [
-    {
-      period: "JAN 2026 — PRESENT",
-      role: "Software Engineer / Analyst – AI",
-      company: "PibyThree Consulting Services Pvt. Ltd.",
-      location: "Mumbai, India",
-      summary: "Promoted within 18 months. Leading agentic architecture, evaluation pipelines, and LLM infrastructure.",
-      highlights: [
-        "Designed Celery evaluation sidecar scaling asynchronous agent scoring to ~25K evals/day across 6 tenants on 12 workers with p95 < 9s.",
-        "Pi-Agent-IDP: built core SDK and scoring modules for on-premise agentic identity & evaluation, with PII and safety guardrails across 6 deployments.",
-        "GenAI-in-a-Box: co-built internal MLOps/LLMOps platform standardizing RAG and agent delivery across cloud and on-premise (cut SDLC from 14 to 5 weeks).",
-        "Routed traffic across 4 LLM providers via LiteLLM gateway with per-tenant fallbacks and quality gates, cutting LLM spend 38% within 2% evaluation baseline.",
-      ],
-    },
-    {
-      period: "JUL 2024 — DEC 2025",
-      role: "Associate Software Engineer",
-      company: "PibyThree Consulting Services Pvt. Ltd.",
-      location: "Mumbai, India",
-      highlights: [
-        "Built modular, decoupled RAG & agent pipelines (LangGraph, LangChain, LlamaIndex) serving ~40K req/day at p95 2.4s on Kubernetes.",
-        "Shipped LangGraph multi-agent sales platform (forecasting, meeting transcription, market research) used by 12 reps, saving ~30 hrs/week with 13% WAPE.",
-        "Domain agents: hybrid RAG insurance assistant lifting recall@5 from 0.62 to 0.81 on 1,200-q benchmark; booking agent completing 90% of ~1,800 monthly bookings.",
-        "Multimodal GenAI: cash-flow analysis on Claude 3.5 Sonnet; VGG16 + Gemini diagnostic imaging in healthcare.",
-      ],
-    },
-  ],
-  certifications: [
-    { title: "Google Cloud Professional ML Engineer", issuer: "Google Cloud", tag: "GCP_ML" },
-    { title: "AWS Certified ML Engineer - Associate", issuer: "Amazon Web Services", tag: "AWS_MLE" },
-    { title: "Neo4j Certified Professional", issuer: "Neo4j", tag: "GRAPH_AI" },
-    { title: "Anthropic Claude Certified Architect - Foundations", issuer: "Anthropic", tag: "CLAUDE_ARCH" },
-    { title: "AWS Certified Cloud Practitioner", issuer: "Amazon Web Services", tag: "AWS_CCP" },
-  ],
   education: [
     {
       degree: "B.E. Computer Engineering, Honours in AI & ML",
       institution: "SIES GST, University of Mumbai",
-      year: "2024",
+      year: "2020 — 2024",
       grade: "CGPA 9.07 / 10",
     },
     {
@@ -190,13 +93,249 @@ export const PROFILE_DATA: ProfileData = {
     },
   ],
   achievements: [
-    "Multiple academic and enterprise awards across AI competitions and hackathons.",
-    "200+ data structures & algorithms problems solved on LeetCode.",
+    "Promoted to Software Engineer / Analyst within 18 months at PibyThree.",
+    "Multiple academic & enterprise hackathon awards across AI architecture.",
+    "200+ Data Structures & Algorithms problems solved on LeetCode.",
+    "Delivered 7 production systems across BFSI, retail, healthcare, and logistics.",
   ],
-  socials: {
-    github: "https://github.com/intragalactic-stranger",
-    linkedin: "https://linkedin.com/in/ganeshannainar",
-    email: "ganeshanarumuganainar@gmail.com",
-    website: "https://ganeshan.dev",
-  },
+  skillRadials: [
+    {
+      name: "LangGraph & Multi-Agent Orchestration",
+      shortName: "LangGraph",
+      pct: 95,
+      color: "#00cccc",
+      category: "Agentic Systems",
+      detail: "2+ yrs · 4 prod multi-agent systems",
+    },
+    {
+      name: "FastAPI & Python 3.12+ Microservices",
+      shortName: "FastAPI",
+      pct: 96,
+      color: "#00cccc",
+      category: "Backend / API",
+      detail: "Async SSE streaming · p95 < 2.4s",
+    },
+    {
+      name: "Celery / Async Evaluation Sidecars",
+      shortName: "Celery Eval",
+      pct: 92,
+      color: "#00cccc",
+      category: "Evals & Infra",
+      detail: "~25K evals/day · p95 < 9s",
+    },
+    {
+      name: "LLM Guardrails & Observability",
+      shortName: "Guardrails",
+      pct: 93,
+      color: "#00cccc",
+      category: "Evals & Infra",
+      detail: "LangFuse · Phoenix · RAGAS · PII filters",
+    },
+    {
+      name: "LiteLLM Multi-Provider Gateways",
+      shortName: "LiteLLM",
+      pct: 94,
+      color: "#00cccc",
+      category: "Inference",
+      detail: "4 LLM providers · -38% spend cut",
+    },
+    {
+      name: "Graph RAG & Neo4j Multi-Hop",
+      shortName: "Neo4j / Graph",
+      pct: 90,
+      color: "#00cccc",
+      category: "Retrieval",
+      detail: "1.2M nodes · +43% NDCG@10 lift",
+    },
+    {
+      name: "Kubernetes, Helm & Cloud Infra",
+      shortName: "K8s / Cloud",
+      pct: 88,
+      color: "#3888ff",
+      category: "Platforms",
+      detail: "AWS Bedrock · GCP Vertex · Terraform",
+    },
+    {
+      name: "Demand Forecasting & Pricing ML",
+      shortName: "TFT / ML",
+      pct: 89,
+      color: "#3888ff",
+      category: "Forecasting",
+      detail: "13% WAPE across 2,400 SKUs · R² 0.94",
+    },
+  ],
+  skillCategories: [
+    {
+      category: "01 // AGENTIC SYSTEMS & LLM ORCHESTRATION",
+      skills: [
+        "LangGraph",
+        "LangChain",
+        "LlamaIndex",
+        "Claude SDK",
+        "Google ADK",
+        "LiteLLM",
+        "MCP Protocol",
+        "CrewAI",
+        "AutoGPT",
+      ],
+    },
+    {
+      category: "02 // KNOWLEDGE GRAPHS & RETRIEVAL (RAG)",
+      skills: [
+        "Neo4j Cypher",
+        "Graph RAG",
+        "Hybrid Search",
+        "Pinecone",
+        "FAISS",
+        "OpenSearch",
+        "pgvector",
+        "Qdrant",
+        "BM25",
+        "RRF Fusion",
+      ],
+    },
+    {
+      category: "03 // EVALUATIONS, OBSERVABILITY & GUARDRAILS",
+      skills: [
+        "Celery Sidecars",
+        "LangFuse",
+        "Arize Phoenix",
+        "LangSmith",
+        "RAGAS",
+        "Giskard",
+        "OpenTelemetry",
+        "PII Redaction",
+        "DeepEval",
+      ],
+    },
+    {
+      category: "04 // CLOUD, CONTAINERS & LLMOPS",
+      skills: [
+        "Kubernetes",
+        "Helm",
+        "Terraform",
+        "AWS Bedrock",
+        "AWS SageMaker",
+        "GCP Vertex AI",
+        "Docker",
+        "Redis",
+        "FastAPI",
+        "MLflow",
+      ],
+    },
+    {
+      category: "05 // MACHINE LEARNING & FORECASTING",
+      skills: [
+        "PyTorch",
+        "Temporal Fusion Transformer (TFT)",
+        "XGBoost",
+        "Scikit-learn",
+        "Pandas",
+        "NumPy",
+        "Evidently AI",
+        "ZenML",
+      ],
+    },
+  ],
+  activeLearning: [
+    {
+      title: "Advanced Multi-Agent Verification & Speculative Distillation",
+      status: "ACTIVE_RESEARCH",
+    },
+    {
+      title: "Self-Refining Neo4j Ontologies with Real-Time Embedding Synapses",
+      status: "PROTOTYPING",
+    },
+  ],
+  projects: [
+    {
+      id: "retail-intelligence",
+      title: "Autonomous Retail Intelligence & Dynamic Promotion System",
+      category: "AUTONOMOUS SYSTEMS",
+      categoryColor: "#f59e0b",
+      description:
+        "Agentic forecasting and dynamic pricing system combining Temporal Fusion Transformer (TFT) demand forecasting and XGBoost/MLP pricing models with multi-step LLM validation.",
+      metrics: "13% WAPE across 2,400 SKUs | R² 0.94 pricing | Pricing turnaround cut from 2 days to <15 min",
+      stack: ["LangGraph", "PyTorch TFT", "XGBoost", "FastAPI", "Kubernetes", "AWS Bedrock"],
+      archIcon: `⬡──[TFT_FORECAST]──➔[XGB_PRICING]──➔[AGENT_VALIDATION]──➔[API]`,
+      githubUrl: "https://github.com/intragalactic-stranger",
+      liveUrl: "https://ganeshan.dev",
+    },
+    {
+      id: "graph-rag",
+      title: "Graph RAG for Hyper-Personalized Product Recommendations",
+      category: "GRAPH AI",
+      categoryColor: "#00cccc",
+      description:
+        "Modeled 180K customers and 25K products as a 1.2M-node / 4.8M-edge Neo4j knowledge graph to enable multi-hop reasoning and dense vector traversal in a hybrid pipeline.",
+      metrics: "+43% NDCG@10 relevancy lift | 0.89 precision & 0.92 answer relevancy on RAGAS benchmarks",
+      stack: ["Neo4j", "Graph RAG", "Pinecone", "FastAPI", "RAGAS", "Claude 3.5 Sonnet"],
+      archIcon: `[1.2M_NODES]──(MULTI-HOP)──➔[DENSE_VECTOR]──➔[RAGAS_EVAL: 0.92]`,
+      githubUrl: "https://github.com/intragalactic-stranger",
+      liveUrl: "https://ganeshan.dev",
+    },
+    {
+      id: "pi-agent-idp",
+      title: "Pi-Agent-IDP & Celery Asynchronous Evaluation Sidecar",
+      category: "LLM INFRASTRUCTURE",
+      categoryColor: "#3888ff",
+      description:
+        "Celery-based evaluation sidecar with isolated per-tenant queues, scaling asynchronous agent scoring across 6 tenants on 12 workers with strict safety and PII enforcement.",
+      metrics: "~25,000 evals/day across 6 tenants | p95 scoring latency < 9s during batch spikes",
+      stack: ["Celery", "Redis", "LangFuse", "Phoenix", "Docker", "FastAPI", "Python 3.12"],
+      archIcon: `[TENANT_QUEUE]──➔[12_CELERY_WORKERS]──➔[PII_FILTER]──➔[LANGFUSE_TRACES]`,
+      githubUrl: "https://github.com/intragalactic-stranger",
+      liveUrl: "https://ganeshan.dev",
+    },
+    {
+      id: "genai-in-a-box",
+      title: "GenAI-in-a-Box & LiteLLM Multi-Provider Enterprise Gateway",
+      category: "ML PLATFORMS",
+      categoryColor: "#10b981",
+      description:
+        "Internal MLOps/LLMOps platform standardizing RAG and agent delivery across cloud and on-premise, paired with a LiteLLM gateway with per-tenant fallbacks and quality gates.",
+      metrics: "Delivery time reduced 14w → 5w (-64%) | -38% LLM infrastructure spend reduction",
+      stack: ["LiteLLM", "Kubernetes", "Helm", "Terraform", "FastAPI", "AWS", "GCP"],
+      archIcon: `[LITELLM_GATEWAY]──➔[4_PROVIDERS]──➔[K8S_HELM_CLUSTER]──➔[-38%_COST]`,
+      githubUrl: "https://github.com/intragalactic-stranger",
+      liveUrl: "https://ganeshan.dev",
+    },
+  ],
+  certifications: [
+    {
+      title: "Google Cloud Certified Professional Machine Learning Engineer",
+      issuer: "Google Cloud",
+      tag: "GCP_ML_PRO",
+      tint: "blue",
+      year: "2024",
+    },
+    {
+      title: "AWS Certified Machine Learning Engineer – Associate",
+      issuer: "Amazon Web Services",
+      tag: "AWS_MLE_ASSOC",
+      tint: "green",
+      year: "2024",
+    },
+    {
+      title: "Neo4j Certified Professional (Knowledge Graphs & Cypher)",
+      issuer: "Neo4j",
+      tag: "NEO4J_CERT_PRO",
+      tint: "teal",
+      year: "2024",
+    },
+    {
+      title: "Anthropic Claude Certified Architect Foundations",
+      issuer: "Anthropic",
+      tag: "CLAUDE_ARCH",
+      tint: "purple",
+      year: "2024",
+    },
+    {
+      title: "AWS Certified Cloud Practitioner",
+      issuer: "Amazon Web Services",
+      tag: "AWS_CCP",
+      tint: "green",
+      year: "2023",
+    },
+  ],
 };

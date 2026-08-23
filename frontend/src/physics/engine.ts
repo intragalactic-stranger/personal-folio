@@ -1,7 +1,7 @@
 import { Vector2D } from "./vector2d";
 import { Cluster } from "./cluster";
 import { Starfield } from "./starfield";
-import { CanvasRenderer } from "../render/canvas_renderer";
+import { CanvasRenderer, SelectedNodeInfo } from "../render/canvas_renderer";
 
 export class PhysicsEngine {
   private canvas: HTMLCanvasElement;
@@ -11,13 +11,16 @@ export class PhysicsEngine {
   private clusters: Cluster[] = [];
   private centerNode: Vector2D;
   private mousePos: Vector2D | null = null;
-  private mouseRadius = 160;
-  private mouseForce = 14;
+  private mouseRadius = 150;
+  private mouseForce = 12;
   private dpr = 1;
   private isRunning = false;
   private isTerminalOpen = false;
   private animFrameId: number | null = null;
   private onCenterNodeClickCallback: (() => void) | null = null;
+  private hoveredCluster: Cluster | null = null;
+  private selectedNode: SelectedNodeInfo | null = null;
+  private isLegendCollapsed = true;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -41,6 +44,10 @@ export class PhysicsEngine {
 
   public setTerminalOpen(open: boolean): void {
     this.isTerminalOpen = open;
+    if (open) {
+      this.selectedNode = null;
+      this.hoveredCluster = null;
+    }
   }
 
   private setupListeners(): void {
@@ -55,31 +62,77 @@ export class PhysicsEngine {
       } else {
         this.mousePos.set(e.clientX, e.clientY);
       }
+      this.checkHoverStates(e.clientX, e.clientY);
     });
 
     window.addEventListener("mouseleave", () => {
       this.mousePos = null;
+      this.hoveredCluster = null;
     });
 
     this.canvas.addEventListener("click", (e: MouseEvent) => {
-      const clickDist = this.centerNode.dist(new Vector2D(e.clientX, e.clientY));
+      const clickPos = new Vector2D(e.clientX, e.clientY);
+
+      // 1. Check Legend overlay click (bottom-left)
+      if (
+        !this.isTerminalOpen &&
+        e.clientX >= 24 &&
+        e.clientX <= 284 &&
+        e.clientY >= window.innerHeight - 175 &&
+        e.clientY <= window.innerHeight - 16
+      ) {
+        this.isLegendCollapsed = !this.isLegendCollapsed;
+        return;
+      }
+
+      // 2. Check if a specific particle node was clicked
+      if (!this.isTerminalOpen) {
+        let clickedParticle = false;
+        for (const c of this.clusters) {
+          for (const p of c.particles) {
+            if (p.type === "label" && p.label) {
+              const d = clickPos.dist(p.pos);
+              if (d < 24) {
+                this.selectedNode = {
+                  particle: p,
+                  clusterTheme: c.themeTitle,
+                  category: c.meta.zoneCode,
+                };
+                clickedParticle = true;
+                break;
+              }
+            }
+          }
+          if (clickedParticle) break;
+        }
+
+        if (clickedParticle) return;
+      }
+
+      // 3. Check Central Profile Node click
+      const clickDist = this.centerNode.dist(clickPos);
       if (clickDist < 85 || !this.isTerminalOpen) {
+        this.selectedNode = null;
         if (this.onCenterNodeClickCallback) {
           this.onCenterNodeClickCallback();
         }
       }
     });
 
-    window.addEventListener("touchmove", (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        if (!this.mousePos) {
-          this.mousePos = new Vector2D(touch.clientX, touch.clientY);
-        } else {
-          this.mousePos.set(touch.clientX, touch.clientY);
+    window.addEventListener(
+      "touchmove",
+      (e: TouchEvent) => {
+        if (e.touches.length > 0) {
+          const touch = e.touches[0];
+          if (!this.mousePos) {
+            this.mousePos = new Vector2D(touch.clientX, touch.clientY);
+          } else {
+            this.mousePos.set(touch.clientX, touch.clientY);
+          }
         }
-      }
-    }, { passive: true });
+      },
+      { passive: true }
+    );
 
     window.addEventListener("touchend", () => {
       this.mousePos = null;
@@ -92,6 +145,32 @@ export class PhysicsEngine {
         this.start();
       }
     });
+  }
+
+  private checkHoverStates(x: number, y: number): void {
+    if (this.isTerminalOpen) {
+      this.hoveredCluster = null;
+      return;
+    }
+
+    const mouse = new Vector2D(x, y);
+
+    // Check cluster centroid proximity
+    let foundCluster: Cluster | null = null;
+    for (const c of this.clusters) {
+      if (mouse.dist(c.center) < c.radius + 30) {
+        foundCluster = c;
+        break;
+      }
+    }
+    this.hoveredCluster = foundCluster;
+
+    // Check individual particle hover
+    for (const c of this.clusters) {
+      for (const p of c.particles) {
+        p.isHovered = mouse.dist(p.pos) < 22;
+      }
+    }
   }
 
   public handleResize(): void {
@@ -117,13 +196,13 @@ export class PhysicsEngine {
     const height = window.innerHeight;
     this.centerNode.set(width / 2, height / 2);
 
-    // Orbital satellite positions around screen center
+    // Orbital satellite positions around screen center with ample spacing
     const clusterPositions = [
-      { x: width * 0.20, y: height * 0.26, count: 24, radius: 80, color: "#38bdf8" }, // 01 Agentic Systems (Top-Left)
-      { x: width * 0.80, y: height * 0.26, count: 24, radius: 80, color: "#58a6ff" }, // 02 Graph RAG (Top-Right)
-      { x: width * 0.83, y: height * 0.72, count: 22, radius: 75, color: "#38bdf8" }, // 03 Evals & Infra (Bottom-Right)
-      { x: width * 0.17, y: height * 0.72, count: 24, radius: 80, color: "#58a6ff" }, // 04 Cloud & Platforms (Bottom-Left)
-      { x: width * 0.50, y: height * 0.84, count: 22, radius: 75, color: "#38bdf8" }, // 05 Forecasting & ML (Bottom-Mid)
+      { x: width * 0.18, y: height * 0.25, count: 20, radius: 85, color: "#00cccc" }, // 01 Agentic Systems (Top-Left)
+      { x: width * 0.82, y: height * 0.25, count: 20, radius: 85, color: "#3888ff" }, // 02 Graph RAG (Top-Right)
+      { x: width * 0.84, y: height * 0.72, count: 18, radius: 80, color: "#00cccc" }, // 03 Evals & Infra (Bottom-Right)
+      { x: width * 0.16, y: height * 0.72, count: 20, radius: 85, color: "#3888ff" }, // 04 Cloud & Platforms (Bottom-Left)
+      { x: width * 0.50, y: height * 0.85, count: 18, radius: 80, color: "#00cccc" }, // 05 Forecasting & ML (Bottom-Mid)
     ];
 
     clusterPositions.forEach((cp, idx) => {
@@ -133,7 +212,7 @@ export class PhysicsEngine {
           center: new Vector2D(cp.x, cp.y),
           particleCount: cp.count,
           radius: cp.radius,
-          gravityStrength: 0.024,
+          gravityStrength: 0.022,
           color: cp.color,
         })
       );
@@ -163,10 +242,9 @@ export class PhysicsEngine {
   }
 
   private update(): void {
-    // 1. Starfield twinkling & slow drift
     this.starfield.update();
 
-    // 2. Cursor repulsion physics over all cluster particles
+    // Cursor repulsion physics
     if (this.mousePos) {
       const mouse = this.mousePos;
       const rRepulse = this.mouseRadius;
@@ -188,7 +266,7 @@ export class PhysicsEngine {
       }
     }
 
-    // 3. Cluster gravitation & spring update
+    // Cluster gravitation & spring update
     for (const cluster of this.clusters) {
       cluster.update();
     }
@@ -202,6 +280,10 @@ export class PhysicsEngine {
     this.renderer.drawCursorField(this.mousePos, this.mouseRadius);
     this.renderer.drawStarfield(this.starfield);
     this.renderer.drawCentralNode(this.centerNode, this.isTerminalOpen);
-    this.renderer.drawClusters(this.clusters, this.centerNode);
+    this.renderer.drawClusters(this.clusters, this.centerNode, this.hoveredCluster, this.selectedNode);
+
+    if (!this.isTerminalOpen) {
+      this.renderer.drawLegendOverlay(width, height, this.isLegendCollapsed);
+    }
   }
 }
