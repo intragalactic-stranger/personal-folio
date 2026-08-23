@@ -85,7 +85,7 @@ export class ContentSections {
 
           <!-- Achievements & Impact Card -->
           <div class="info-card">
-            <div class="info-card-title">🏆 ACHIEVEMENTS & IMPACT</div>
+            <div class="info-card-title">🏆 ACHIEVEMENTS &amp; IMPACT</div>
             ${PROFILE_DATA.achievements
               .map(
                 (ach) => `
@@ -100,10 +100,6 @@ export class ContentSections {
               Delivered 7 production systems across BFSI, retail, healthcare, and logistics.
             </div>
           </div>
-        </div>
-
-        <div class="scroll-hint-bar">
-          <span class="scroll-hint-text">▼ [ SCROLL TO EXPLORE ARSENAL &amp; SYSTEMS ]</span>
         </div>
       </div>
     `;
@@ -152,14 +148,14 @@ export class ContentSections {
       <div class="section-content" id="section-skills">
         <div class="section-title-line">03 // TECHNICAL_ARSENAL &amp; PROFICIENCY_RINGS</div>
         
-        <!-- Radial Proficiency Rings Cluster (Widget 1) -->
+        <!-- Radial Proficiency Rings Cluster (Widget 1 - Single Horizontal Row) -->
         <div class="radial-cluster-box" id="skills-rings">
           <div class="cluster-heading">CORE ARCHITECTURAL PROFICIENCY RINGS</div>
-          <div class="radial-rings-grid">
+          <div class="radial-rings-single-row">
             ${PROFILE_DATA.skillRadials
               .map((sr) => {
-                const radius = 40;
-                const circumference = 2 * Math.PI * radius; // ~251.3
+                const radius = 38;
+                const circumference = 2 * Math.PI * radius; // ~238.76
                 const targetOffset = circumference - (circumference * sr.pct) / 100;
                 return `
                 <div class="radial-ring-card" title="${sr.detail}">
@@ -173,8 +169,8 @@ export class ContentSections {
                       style="stroke: ${sr.color}; stroke-dasharray: ${circumference}; stroke-dashoffset: ${targetOffset};"
                       data-target-offset="${targetOffset}"
                     />
-                    <text x="50" y="46" text-anchor="middle" class="ring-pct" style="fill: ${sr.color};">${sr.pct}%</text>
-                    <text x="50" y="60" text-anchor="middle" class="ring-name">${sr.shortName}</text>
+                    <text x="50" y="47" text-anchor="middle" class="ring-pct" style="fill: ${sr.color};">${sr.pct}%</text>
+                    <text x="50" y="62" text-anchor="middle" class="ring-name">${sr.shortName}</text>
                   </svg>
                   <div class="radial-card-footer">${sr.category}</div>
                 </div>

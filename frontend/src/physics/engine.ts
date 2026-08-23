@@ -73,13 +73,13 @@ export class PhysicsEngine {
     this.canvas.addEventListener("click", (e: MouseEvent) => {
       const clickPos = new Vector2D(e.clientX, e.clientY);
 
-      // 1. Check Legend overlay click (bottom-left)
+      // 1. Check Legend overlay click in bottom-left
       if (
         !this.isTerminalOpen &&
-        e.clientX >= 24 &&
-        e.clientX <= 284 &&
-        e.clientY >= window.innerHeight - 175 &&
-        e.clientY <= window.innerHeight - 16
+        e.clientX >= 20 &&
+        e.clientX <= 280 &&
+        e.clientY >= window.innerHeight - 170 &&
+        e.clientY <= window.innerHeight - 12
       ) {
         this.isLegendCollapsed = !this.isLegendCollapsed;
         return;
@@ -158,7 +158,7 @@ export class PhysicsEngine {
     // Check cluster centroid proximity
     let foundCluster: Cluster | null = null;
     for (const c of this.clusters) {
-      if (mouse.dist(c.center) < c.radius + 30) {
+      if (mouse.dist(c.center) < c.radius + 35) {
         foundCluster = c;
         break;
       }
@@ -196,13 +196,13 @@ export class PhysicsEngine {
     const height = window.innerHeight;
     this.centerNode.set(width / 2, height / 2);
 
-    // Orbital satellite positions around screen center with ample spacing
+    // Satellite positions with ample padding from screen edges
     const clusterPositions = [
-      { x: width * 0.18, y: height * 0.25, count: 20, radius: 85, color: "#00cccc" }, // 01 Agentic Systems (Top-Left)
-      { x: width * 0.82, y: height * 0.25, count: 20, radius: 85, color: "#3888ff" }, // 02 Graph RAG (Top-Right)
-      { x: width * 0.84, y: height * 0.72, count: 18, radius: 80, color: "#00cccc" }, // 03 Evals & Infra (Bottom-Right)
-      { x: width * 0.16, y: height * 0.72, count: 20, radius: 85, color: "#3888ff" }, // 04 Cloud & Platforms (Bottom-Left)
-      { x: width * 0.50, y: height * 0.85, count: 18, radius: 80, color: "#00cccc" }, // 05 Forecasting & ML (Bottom-Mid)
+      { x: width * 0.18, y: height * 0.26, count: 20, radius: 80, color: "#00cccc" }, // 01 Agentic Systems
+      { x: width * 0.82, y: height * 0.26, count: 20, radius: 80, color: "#3888ff" }, // 02 Graph RAG
+      { x: width * 0.84, y: height * 0.70, count: 18, radius: 78, color: "#00cccc" }, // 03 Evals & Infra
+      { x: width * 0.16, y: height * 0.70, count: 20, radius: 80, color: "#3888ff" }, // 04 Cloud & Platforms
+      { x: width * 0.50, y: height * 0.76, count: 18, radius: 75, color: "#00cccc" }, // 05 Forecasting & ML
     ];
 
     clusterPositions.forEach((cp, idx) => {

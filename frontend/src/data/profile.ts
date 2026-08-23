@@ -116,14 +116,6 @@ export const PROFILE_DATA: ProfileData = {
       detail: "Async SSE streaming · p95 < 2.4s",
     },
     {
-      name: "Celery / Async Evaluation Sidecars",
-      shortName: "Celery Eval",
-      pct: 92,
-      color: "#00cccc",
-      category: "Evals & Infra",
-      detail: "~25K evals/day · p95 < 9s",
-    },
-    {
       name: "LLM Guardrails & Observability",
       shortName: "Guardrails",
       pct: 93,

@@ -50,12 +50,12 @@ export class CanvasRenderer {
 
   public drawCentralNode(center: Vector2D, isTerminalOpen: boolean): void {
     const ctx = this.ctx;
-    const pulse = (Math.sin(this.pulseTimer) + 1) / 2; // 0 to 1
+    const pulse = (Math.sin(this.pulseTimer) + 1) / 2;
     const radius = 74;
 
     ctx.save();
 
-    // 1. Outer cybernetic pulsing ring
+    // 1. Outer pulsing ring
     const ringRadius = radius + 10 + pulse * 6;
     ctx.strokeStyle = `rgba(0, 204, 204, ${0.25 + pulse * 0.25})`;
     ctx.lineWidth = 1.2;
@@ -113,7 +113,7 @@ export class CanvasRenderer {
     ctx.shadowBlur = 4;
     ctx.fillText("SYSTEMS & EVALS", center.x, center.y + 26);
 
-    // 4. Interactive Callout below central node (when terminal is closed)
+    // 4. Interactive Callout below central node
     if (!isTerminalOpen) {
       const hintY = center.y + radius + 28;
       const hintText = "[ ✦ CLICK NODE OR PRESS ANY KEY TO OPEN TERMINAL ]";
@@ -138,7 +138,7 @@ export class CanvasRenderer {
     for (const cluster of clusters) {
       const isHovered = hoveredCluster?.id === cluster.id;
 
-      // 1. Draw Master Constellation Trunk from Center Node to Cluster
+      // 1. Draw Master Constellation Trunk
       ctx.save();
       const trunkGrad = ctx.createLinearGradient(
         centerNode.x,
@@ -159,7 +159,7 @@ export class CanvasRenderer {
       ctx.stroke();
       ctx.restore();
 
-      // 2. Draw cluster title badge at centroid in a dark pill background
+      // 2. Draw cluster title badge in a dark pill background
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -182,7 +182,7 @@ export class CanvasRenderer {
       ctx.fillText(titleText, cluster.center.x, titleY);
       ctx.restore();
 
-      // 3. Draw inter-particle constellation lines within cluster (increased visibility ~0.25)
+      // 3. Draw inter-particle constellation lines
       ctx.save();
       const pLen = cluster.particles.length;
       for (let i = 0; i < pLen; i++) {
@@ -205,7 +205,7 @@ export class CanvasRenderer {
       }
       ctx.restore();
 
-      // 4. Draw particles & technology labels (guarded against undefined)
+      // 4. Draw particles & technology labels
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -255,7 +255,7 @@ export class CanvasRenderer {
       ctx.restore();
     }
 
-    // 5. Draw Cluster Zone Hover Stat Card
+    // 5. Draw Cluster Zone Hover Stat Card (Auto-sized and clamped)
     if (hoveredCluster) {
       this.drawClusterHoverCard(hoveredCluster);
     }
@@ -268,33 +268,52 @@ export class CanvasRenderer {
 
   private drawClusterHoverCard(cluster: Cluster): void {
     const ctx = this.ctx;
-    const x = cluster.center.x;
-    const y = cluster.center.y + cluster.radius + 24;
-    const width = 280;
-    const height = 48;
-
     ctx.save();
-    ctx.fillStyle = "rgba(8, 12, 18, 0.95)";
+    ctx.font = "10px 'JetBrains Mono', monospace";
+    const summaryWidth = ctx.measureText(cluster.meta.summary).width;
+    const titleWidth = ctx.measureText(`⬡ ${cluster.meta.zoneCode}`).width;
+    const contentWidth = Math.max(summaryWidth, titleWidth);
+    const boxWidth = Math.max(340, contentWidth + 40);
+    const boxHeight = 52;
+
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+
+    // Smart vertical positioning: if cluster is in lower half, position ABOVE cluster
+    let boxY: number;
+    if (cluster.center.y > screenH * 0.52) {
+      boxY = cluster.center.y - cluster.radius - boxHeight - 20;
+    } else {
+      boxY = cluster.center.y + cluster.radius + 20;
+    }
+
+    // Clamp inside viewport
+    boxY = Math.max(65, Math.min(screenH - boxHeight - 20, boxY));
+
+    let boxX = cluster.center.x;
+    boxX = Math.max(boxWidth / 2 + 16, Math.min(screenW - boxWidth / 2 - 16, boxX));
+
+    ctx.fillStyle = "rgba(6, 10, 16, 0.96)";
     ctx.strokeStyle = "#00cccc";
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.3;
     ctx.shadowColor = "#00cccc";
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 14;
 
     ctx.beginPath();
-    ctx.roundRect(x - width / 2, y, width, height, 4);
+    ctx.roundRect(boxX - boxWidth / 2, boxY, boxWidth, boxHeight, 5);
     ctx.fill();
     ctx.stroke();
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.font = "bold 10px 'JetBrains Mono', monospace";
+    ctx.font = "bold 11px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00cccc";
-    ctx.fillText(`⬡ ${cluster.meta.zoneCode}`, x, y + 16);
+    ctx.fillText(`⬡ ${cluster.meta.zoneCode}`, boxX, boxY + 18);
 
     ctx.font = "10px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-    ctx.fillText(cluster.meta.summary, x, y + 32);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.fillText(cluster.meta.summary, boxX, boxY + 36);
 
     ctx.restore();
   }
@@ -302,10 +321,15 @@ export class CanvasRenderer {
   private drawNodeTooltip(info: SelectedNodeInfo): void {
     const ctx = this.ctx;
     const p = info.particle;
-    const x = p.pos.x;
-    const y = p.pos.y - 45;
-    const width = 220;
-    const height = 52;
+    const width = 230;
+    const height = 54;
+    const screenW = window.innerWidth;
+
+    let x = p.pos.x;
+    x = Math.max(width / 2 + 16, Math.min(screenW - width / 2 - 16, x));
+
+    let y = p.pos.y - 45;
+    y = Math.max(70, y);
 
     ctx.save();
     ctx.fillStyle = "rgba(6, 10, 16, 0.96)";
@@ -333,24 +357,24 @@ export class CanvasRenderer {
 
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(`NODE: ${p.label || "SYSTEM_PARTICLE"}`, x, y - height + 16);
+    ctx.fillText(`NODE: ${p.label || "SYSTEM_PARTICLE"}`, x, y - height + 18);
 
     ctx.font = "9px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00cccc";
-    ctx.fillText(`ZONE: ${info.clusterTheme}`, x, y - height + 34);
+    ctx.fillText(`ZONE: ${info.clusterTheme}`, x, y - height + 36);
 
     ctx.restore();
   }
 
   public drawLegendOverlay(_width: number, height: number, isCollapsed: boolean): void {
     const ctx = this.ctx;
-    const x = 24;
-    const y = height - (isCollapsed ? 48 : 175);
+    const x = 20;
+    const y = height - (isCollapsed ? 44 : 170);
     const w = 260;
     const h = isCollapsed ? 32 : 155;
 
     ctx.save();
-    ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
+    ctx.fillStyle = "rgba(6, 10, 16, 0.92)";
     ctx.strokeStyle = "rgba(0, 204, 204, 0.35)";
     ctx.lineWidth = 1;
 
