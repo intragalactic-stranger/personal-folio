@@ -257,7 +257,7 @@ export const PROFILE_DATA: ProfileData = {
       id: "graph-rag",
       title: "Graph RAG for Hyper-Personalized Product Recommendations",
       category: "GRAPH AI",
-      categoryColor: "#00cccc",
+      categoryColor: "#ff4d4d",
       description:
         "Modeled 180K customers and 25K products as a 1.2M-node / 4.8M-edge Neo4j knowledge graph to enable multi-hop reasoning and dense vector traversal in a hybrid pipeline.",
       metrics: "+43% NDCG@10 relevancy lift | 0.89 precision & 0.92 answer relevancy on RAGAS benchmarks",

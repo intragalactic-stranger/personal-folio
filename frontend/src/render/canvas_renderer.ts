@@ -288,7 +288,9 @@ export class CanvasRenderer {
 
     let boxY: number;
     if (cluster.center.y > screenH * 0.52) {
-      boxY = cluster.center.y - cluster.radius - boxHeight - 20;
+      // Clear the zone title badge (drawn at radius+14 above the node, ~20px tall)
+      // before the hover card starts, so the two never overlap.
+      boxY = cluster.center.y - cluster.radius - boxHeight - 44;
     } else {
       boxY = cluster.center.y + cluster.radius + 20;
     }
