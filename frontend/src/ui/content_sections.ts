@@ -1,4 +1,5 @@
 import { PROFILE_DATA } from "../data/profile";
+import { TECH_CLUSTERS_CONFIG } from "../render/ascii_glyphs";
 
 export class ContentSections {
   public static getAsciiBanner(): string {
@@ -202,16 +203,17 @@ export class ContentSections {
         <!-- Categorized Skills Grid -->
         <div class="skills-categorized-grid">
           ${PROFILE_DATA.skillCategories
-            .map(
-              (cat) => `
-            <div class="skill-cat-card">
+            .map((cat, i) => {
+              const zoneColor = TECH_CLUSTERS_CONFIG[i % TECH_CLUSTERS_CONFIG.length].color;
+              return `
+            <div class="skill-cat-card" style="--cat-color: ${zoneColor};">
               <div class="skill-cat-title">${cat.category}</div>
               <div class="skill-chips-row">
                 ${cat.skills.map((s) => `<span class="uniform-skill-chip">${s}</span>`).join("")}
               </div>
             </div>
-          `
-            )
+          `;
+            })
             .join("")}
         </div>
 

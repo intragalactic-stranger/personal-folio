@@ -17,7 +17,7 @@ export const TECH_CLUSTERS_CONFIG: TechClusterMeta[] = [
   {
     theme: "01 // AGENTIC_SYSTEMS",
     zoneCode: "ZONE_01_AGENTIC",
-    color: "#00cccc",
+    color: "#ff4d4d",
     summary: "8 frameworks · LangGraph primary · 95% proficiency",
     tags: ["LangGraph", "Agents", "LiteLLM", "MCP", "Claude", "Gemini", "Guardrails", "Tools", "Routing"],
   },
