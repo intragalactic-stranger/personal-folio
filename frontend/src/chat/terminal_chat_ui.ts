@@ -223,6 +223,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     const bodySpan = assistantRow.querySelector(".msg-body") as HTMLElement;
     let accumulatedText = "";
     this.isStreaming = true;
+    this.setSendingState(true);
 
     try {
       await this.controller.sendMessage(text, (chunk) => {
@@ -238,8 +239,17 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
       bodySpan.innerHTML = `<span style="color: var(--color-status-red)">ENGINE_ERROR: Unable to connect. Try /contact for direct reach.</span>`;
     } finally {
       this.isStreaming = false;
+      this.setSendingState(false);
       this.scrollToBottom();
     }
+  }
+
+  private setSendingState(sending: boolean): void {
+    const sendBtn = this.container.querySelector("#chat-send-btn") as HTMLButtonElement;
+    sendBtn.disabled = sending;
+    sendBtn.textContent = sending ? "..." : "SEND";
+    this.inputElement.disabled = sending;
+    if (!sending) this.inputElement.focus();
   }
 
   private appendUserMessage(text: string): void {

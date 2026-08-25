@@ -255,6 +255,11 @@
   outline: none;
 }
 
+.chat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chat-send-btn {
   background: rgba(0, 204, 204, 0.15);
   border: 1px solid #00cccc;

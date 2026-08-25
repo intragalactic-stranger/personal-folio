@@ -330,6 +330,7 @@
 .chip-num {
   font-weight: 700;
   color: #ffffff;
+  font-variant-numeric: tabular-nums;
 }
 
 .chip-txt {
@@ -400,6 +401,8 @@
   margin-bottom: 0.85rem;
   font-size: 0.95rem;
   line-height: 1.7;
+  max-width: 72ch;
+  text-wrap: pretty;
 }
 
 /* Two-column cards in Hero/About */
@@ -515,6 +518,7 @@
   color: #ffffff;
   margin: 0.35rem 0 0.5rem 0;
   font-weight: 600;
+  text-wrap: balance;
 }
 
 .card-arch-sketch {
@@ -535,6 +539,7 @@
   font-size: 0.88rem;
   line-height: 1.55;
   margin-bottom: 0.85rem;
+  text-wrap: pretty;
 }
 
 .card-metric-highlight {
@@ -927,6 +932,7 @@
   font-size: 1.35rem;
   font-weight: 700;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .dash-stat-sub {
