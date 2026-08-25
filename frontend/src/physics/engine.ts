@@ -208,9 +208,9 @@ export class PhysicsEngine {
     const clusterPositions = [
       { x: cx - Rx * 0.84, y: cy - Ry * 0.65, count: 22, radius: 85, color: "#00cccc" }, // 01 Agentic Systems (Top-Left)
       { x: cx + Rx * 0.84, y: cy - Ry * 0.65, count: 22, radius: 85, color: "#3888ff" }, // 02 Graph RAG (Top-Right)
-      { x: cx + Rx * 0.80, y: cy + Ry * 0.66, count: 22, radius: 85, color: "#00cccc" }, // 03 Evals & Infra (Bottom-Right)
-      { x: cx - Rx * 0.80, y: cy + Ry * 0.66, count: 22, radius: 85, color: "#3888ff" }, // 04 Cloud & Platforms (Bottom-Left)
-      { x: cx,             y: height * 0.82,  count: 22, radius: 82, color: "#00cccc" }, // 05 Forecasting & ML (Bottom-Center)
+      { x: cx + Rx * 0.80, y: cy + Ry * 0.66, count: 22, radius: 85, color: "#22e5a8" }, // 03 Evals & Infra (Bottom-Right)
+      { x: cx - Rx * 0.80, y: cy + Ry * 0.66, count: 22, radius: 85, color: "#a855f7" }, // 04 Cloud & Platforms (Bottom-Left)
+      { x: cx,             y: height * 0.82,  count: 22, radius: 82, color: "#ff9f1c" }, // 05 Forecasting & ML (Bottom-Center)
     ];
 
     clusterPositions.forEach((cp, idx) => {

@@ -1,4 +1,5 @@
 import { ChatController } from "./chat_controller";
+import { Mascot } from "../ui/mascot";
 
 export class TerminalChatUi {
   private container: HTMLElement;
@@ -6,6 +7,7 @@ export class TerminalChatUi {
   private messagesContainer!: HTMLElement;
   private inputElement!: HTMLInputElement;
   private engineTagElement!: HTMLElement;
+  private mascot!: Mascot;
   private isMinimized = false;
   private isFullscreen = false;
   private isStreaming = false;
@@ -23,7 +25,7 @@ export class TerminalChatUi {
     this.container.innerHTML = `
       <div class="chat-header" id="chat-header">
         <div class="chat-title-group">
-          <span class="chat-pulse-icon" style="font-weight: 700; font-size: 0.85rem; color: #00cccc;">&gt;_&lt;</span>
+          <span class="mascot" id="chat-mascot"></span>
           <span class="chat-title">GANESHAN // AI_ASSISTANT</span>
           <button class="chat-engine-tag" id="chat-engine-tag" title="Click to toggle between Chrome Gemini & Bedrock">
             INITIALIZING...
@@ -63,6 +65,10 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     this.messagesContainer = this.container.querySelector("#chat-messages") as HTMLElement;
     this.inputElement = this.container.querySelector("#chat-input") as HTMLInputElement;
     this.engineTagElement = this.container.querySelector("#chat-engine-tag") as HTMLElement;
+
+    const mascotEl = this.container.querySelector("#chat-mascot") as HTMLElement;
+    this.mascot = new Mascot(mascotEl);
+    this.mascot.startIdleBlink();
 
     this.controller.onEngineSwitchCallback = (newEngine, reason) => {
       this.updateEngineBadge(newEngine);
@@ -120,6 +126,9 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
         e.preventDefault();
         this.handleSubmit();
       }
+    });
+    this.inputElement.addEventListener("input", () => {
+      if (!this.isStreaming) this.mascot.setState("typing");
     });
 
     // Quick prompt chip clicks
@@ -224,6 +233,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     let accumulatedText = "";
     this.isStreaming = true;
     this.setSendingState(true);
+    this.mascot.setState("thinking");
 
     try {
       await this.controller.sendMessage(text, (chunk) => {
@@ -235,8 +245,10 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
           bodySpan.innerHTML = this.formatMarkdown(accumulatedText);
         }
       });
+      this.mascot.setState("happy");
     } catch {
       bodySpan.innerHTML = `<span style="color: var(--color-status-red)">ENGINE_ERROR: Unable to connect. Try /contact for direct reach.</span>`;
+      this.mascot.setState("error");
     } finally {
       this.isStreaming = false;
       this.setSendingState(false);

@@ -60,8 +60,64 @@
   gap: 0.5rem;
 }
 
-.chat-pulse-icon {
-  animation: pulse-cyan 2s infinite;
+/* Reactive companion glyph — mirrors chat state (idle/typing/thinking/happy/error) */
+.mascot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  min-width: 4.4em;
+  color: var(--color-blue-primary);
+  text-shadow: var(--glow-cyan);
+  animation: mascot-bob 2.6s ease-in-out infinite;
+}
+
+.mascot.state-typing {
+  color: #ffffff;
+  animation: mascot-alert var(--dur-base) var(--ease-out);
+}
+
+.mascot.state-thinking {
+  color: var(--color-status-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+  animation: mascot-hop 0.5s ease-in-out infinite;
+}
+
+.mascot.state-happy {
+  color: var(--color-status-amber);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  animation: mascot-jump 0.45s var(--ease-out);
+}
+
+.mascot.state-error {
+  color: var(--color-status-red);
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+  animation: mascot-alert var(--dur-base) var(--ease-out);
+}
+
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes mascot-hop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.08); }
+}
+
+@keyframes mascot-jump {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-7px) scale(1.15); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes mascot-alert {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .chat-title {

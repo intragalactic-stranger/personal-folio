@@ -23,6 +23,13 @@ export class CanvasRenderer {
     this.pulseTimer += 0.03;
   }
 
+  private hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
   public drawStarfield(starfield: Starfield): void {
     const ctx = this.ctx;
     ctx.save();
@@ -169,15 +176,15 @@ export class CanvasRenderer {
       const titleY = cluster.center.y - cluster.radius - 14;
 
       ctx.fillStyle = "rgba(6, 10, 16, 0.9)";
-      ctx.strokeStyle = isHovered ? "rgba(0, 204, 204, 0.8)" : "rgba(0, 204, 204, 0.35)";
+      ctx.strokeStyle = isHovered ? this.hexToRgba(cluster.color, 0.8) : this.hexToRgba(cluster.color, 0.35);
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(cluster.center.x - titleWidth / 2 - 8, titleY - 10, titleWidth + 16, 20, 4);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = isHovered ? "#ffffff" : "rgba(0, 204, 204, 0.85)";
-      ctx.shadowColor = "#00cccc";
+      ctx.fillStyle = isHovered ? "#ffffff" : this.hexToRgba(cluster.color, 0.85);
+      ctx.shadowColor = cluster.color;
       ctx.shadowBlur = isHovered ? 8 : 4;
       ctx.fillText(titleText, cluster.center.x, titleY);
       ctx.restore();
@@ -194,7 +201,7 @@ export class CanvasRenderer {
           if (distSq < maxDist * maxDist) {
             const dist = Math.sqrt(distSq);
             const lineAlpha = (1 - dist / maxDist) * 0.28;
-            ctx.strokeStyle = `rgba(0, 204, 204, ${lineAlpha})`;
+            ctx.strokeStyle = this.hexToRgba(cluster.color, lineAlpha);
             ctx.lineWidth = (p1.type === "label" && p2.type === "label") ? 1.0 : 0.7;
             ctx.beginPath();
             ctx.moveTo(p1.pos.x, p1.pos.y);
@@ -218,7 +225,7 @@ export class CanvasRenderer {
           const height = 18;
 
           ctx.fillStyle = "rgba(6, 10, 16, 0.88)";
-          ctx.strokeStyle = p.isHovered ? "#00cccc" : "rgba(0, 204, 204, 0.45)";
+          ctx.strokeStyle = p.isHovered ? cluster.color : this.hexToRgba(cluster.color, 0.45);
           ctx.lineWidth = p.isHovered ? 1.5 : 1;
           ctx.beginPath();
           ctx.roundRect(
@@ -232,7 +239,7 @@ export class CanvasRenderer {
           ctx.stroke();
 
           ctx.fillStyle = p.isHovered ? "#ffffff" : "rgba(255, 255, 255, 0.88)";
-          ctx.shadowColor = "#00cccc";
+          ctx.shadowColor = cluster.color;
           ctx.shadowBlur = p.isHovered ? 8 : 4;
           ctx.fillText(p.label, p.pos.x, p.pos.y);
         } else if (p.type === "spinner") {
@@ -292,9 +299,9 @@ export class CanvasRenderer {
     boxX = Math.max(boxWidth / 2 + 16, Math.min(screenW - boxWidth / 2 - 16, boxX));
 
     ctx.fillStyle = "rgba(6, 10, 16, 0.96)";
-    ctx.strokeStyle = "#00cccc";
+    ctx.strokeStyle = cluster.color;
     ctx.lineWidth = 1.3;
-    ctx.shadowColor = "#00cccc";
+    ctx.shadowColor = cluster.color;
     ctx.shadowBlur = 14;
 
     ctx.beginPath();
@@ -306,7 +313,7 @@ export class CanvasRenderer {
     ctx.textBaseline = "middle";
 
     ctx.font = "bold 11px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#00cccc";
+    ctx.fillStyle = cluster.color;
     ctx.fillText(`⬡ ${cluster.meta.zoneCode}`, boxX, boxY + 18);
 
     ctx.font = "10px 'JetBrains Mono', monospace";
@@ -329,11 +336,13 @@ export class CanvasRenderer {
     let y = p.pos.y - 45;
     y = Math.max(70, y);
 
+    const nodeColor = p.color || "#00cccc";
+
     ctx.save();
     ctx.fillStyle = "rgba(6, 10, 16, 0.96)";
-    ctx.strokeStyle = "#00cccc";
+    ctx.strokeStyle = nodeColor;
     ctx.lineWidth = 1.5;
-    ctx.shadowColor = "#00cccc";
+    ctx.shadowColor = nodeColor;
     ctx.shadowBlur = 14;
 
     ctx.beginPath();
@@ -347,7 +356,7 @@ export class CanvasRenderer {
     ctx.lineTo(x + 6, y);
     ctx.lineTo(x, y + 6);
     ctx.closePath();
-    ctx.fillStyle = "#00cccc";
+    ctx.fillStyle = nodeColor;
     ctx.fill();
 
     ctx.textAlign = "center";
@@ -358,7 +367,7 @@ export class CanvasRenderer {
     ctx.fillText(`NODE: ${p.label || "SYSTEM_PARTICLE"}`, x, y - height + 18);
 
     ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#00cccc";
+    ctx.fillStyle = nodeColor;
     ctx.fillText(`ZONE: ${info.clusterTheme}`, x, y - height + 36);
 
     ctx.restore();
