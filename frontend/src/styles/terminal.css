@@ -55,6 +55,12 @@
   50% { opacity: 0.4; transform: scale(0.85); }
 }
 
+/* Was referenced by .chip-dot and .chat-pulse-icon with no matching definition — dead, silently a no-op. Defined for real. */
+@keyframes pulse-cyan {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.88); }
+}
+
 .brand-title {
   font-size: 0.85rem;
   font-weight: 700;
@@ -86,7 +92,7 @@
   padding: 0.35rem 0.65rem;
   font-size: 0.8rem;
   border-radius: 3px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   font-family: var(--font-mono);
   cursor: pointer;
 }
@@ -126,7 +132,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .cv-nav-btn:hover {
@@ -147,7 +153,7 @@
   align-items: center;
   gap: 0.4rem;
   box-shadow: 0 0 10px rgba(0, 204, 204, 0.25);
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   cursor: pointer;
 }
 
@@ -177,7 +183,7 @@
   align-items: center;
   gap: 0.45rem;
   box-shadow: 0 0 12px rgba(0, 204, 204, 0.25);
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   font-family: var(--font-mono);
   cursor: pointer;
 }
@@ -371,13 +377,32 @@
 /* Section Containers */
 .section-content {
   margin-bottom: 2rem;
-  animation: sectionFadeUp 0.35s ease-out;
+  animation: sectionFadeUp var(--dur-slow) var(--ease-out) both;
 }
 
 @keyframes sectionFadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Staggered card entrance — occasional (tab switch), cascade never blocks interaction */
+@keyframes cardFadeUp {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.project-card, .radial-ring-card, .skill-cat-card, .cert-badge, .achieve-card, .info-card {
+  animation: cardFadeUp var(--dur-slow) var(--ease-out) both;
+}
+
+.project-card:nth-child(1), .radial-ring-card:nth-child(1), .skill-cat-card:nth-child(1), .cert-badge:nth-child(1), .achieve-card:nth-child(1), .info-card:nth-child(1) { animation-delay: 0ms; }
+.project-card:nth-child(2), .radial-ring-card:nth-child(2), .skill-cat-card:nth-child(2), .cert-badge:nth-child(2), .achieve-card:nth-child(2), .info-card:nth-child(2) { animation-delay: 50ms; }
+.project-card:nth-child(3), .radial-ring-card:nth-child(3), .skill-cat-card:nth-child(3), .cert-badge:nth-child(3), .achieve-card:nth-child(3), .info-card:nth-child(3) { animation-delay: 100ms; }
+.project-card:nth-child(4), .radial-ring-card:nth-child(4), .skill-cat-card:nth-child(4), .cert-badge:nth-child(4), .achieve-card:nth-child(4), .info-card:nth-child(4) { animation-delay: 150ms; }
+.project-card:nth-child(5), .radial-ring-card:nth-child(5), .skill-cat-card:nth-child(5), .cert-badge:nth-child(5) { animation-delay: 200ms; }
+.project-card:nth-child(6), .radial-ring-card:nth-child(6), .skill-cat-card:nth-child(6), .cert-badge:nth-child(6) { animation-delay: 250ms; }
+.radial-ring-card:nth-child(7), .cert-badge:nth-child(7) { animation-delay: 300ms; }
+.radial-ring-card:nth-child(n+8) { animation-delay: 320ms; }
 
 .section-title-line {
   display: flex;
@@ -418,7 +443,7 @@
   border: 1px solid rgba(0, 204, 204, 0.2);
   border-radius: 6px;
   padding: 1.25rem;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .info-card:hover {
@@ -496,7 +521,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
   position: relative;
 }
 
@@ -590,7 +615,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .pill-btn:hover {
@@ -643,7 +668,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: all 0.25s ease;
+  transition: border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   cursor: default;
 }
 
@@ -710,7 +735,7 @@
   gap: 0.5rem;
   font-size: 0.82rem;
   font-family: var(--font-mono);
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .cert-badge.cert-teal {
@@ -757,7 +782,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   padding: 1.25rem;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .skill-cat-card:hover {
@@ -784,7 +809,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 3px 8px;
   border-radius: 3px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .uniform-skill-chip:hover {
@@ -1076,7 +1101,7 @@
   border-radius: 4px;
   cursor: pointer;
   height: 40px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   font-family: var(--font-mono);
 }
 
@@ -1096,7 +1121,7 @@
   align-items: center;
   gap: 0.4rem;
   height: 40px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   text-decoration: none;
 }
 
@@ -1135,7 +1160,7 @@
   font-size: 0.85rem;
   padding: 0.65rem 0.85rem;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .form-input:focus, .form-textarea:focus {
