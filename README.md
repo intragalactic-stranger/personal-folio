@@ -46,6 +46,22 @@ make lint
 make build
 ```
 
+### GitHub Pages Deployment (Frontend Only)
+
+This repository includes a GitHub Actions workflow at `.github/workflows/deploy-pages.yml` that deploys the static Vite frontend to GitHub Pages.
+
+Repository settings required:
+
+1. Open **Settings → Pages**.
+2. Set **Source** to **GitHub Actions**.
+3. Push to `main` (or run the workflow manually from the Actions tab).
+4. If you see `pages build and deployment` / Jekyll failures referencing `./docs`, Pages is still using legacy branch-source mode. Keep Source on **GitHub Actions** so `.github/workflows/deploy-pages.yml` is used instead.
+
+Important limitation:
+
+- GitHub Pages hosts static files only. It does **not** run the FastAPI backend.
+- Frontend requests to `/api/*` require an externally hosted backend (for example on a separate service) if you want Bedrock/chat/contact backend features in production.
+
 ---
 
 ## Project Structure
