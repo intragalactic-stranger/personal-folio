@@ -55,6 +55,7 @@ Repository settings required:
 1. Open **Settings → Pages**.
 2. Set **Source** to **GitHub Actions**.
 3. Push to `main` (or run the workflow manually from the Actions tab).
+4. If you see `pages build and deployment` / Jekyll failures referencing `./docs`, Pages is still using legacy branch-source mode. Keep Source on **GitHub Actions** so `.github/workflows/deploy-pages.yml` is used instead.
 
 Important limitation:
 
