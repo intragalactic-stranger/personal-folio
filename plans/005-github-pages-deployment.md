@@ -45,6 +45,17 @@ Run these commands from repository root and confirm expected outcomes:
 7. `cd backend && uv run mypy .`
    - Expected: no type errors.
 
+Verification run results in this session:
+
+- `cd frontend && npm ci` ✅
+- `cd frontend && npm run typecheck` ✅
+- `cd frontend && npm run build` ✅ (produced `frontend/dist`)
+- `cd backend && python -m uv sync` ✅ (`uv` was not preinstalled in runner, installed via `python -m pip install uv`)
+- `cd backend && python -m uv sync --extra dev` ✅ (installed `pytest`, `ruff`, `mypy` from optional `dev` dependencies)
+- `cd backend && python -m uv run pytest` ✅ (5 passed)
+- `cd backend && python -m uv run ruff check .` ✅
+- `cd backend && python -m uv run mypy .` ✅
+
 ## Status
 
-draft
+done
