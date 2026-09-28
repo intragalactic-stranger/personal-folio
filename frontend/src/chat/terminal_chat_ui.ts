@@ -1,4 +1,5 @@
 import { ChatController } from "./chat_controller";
+import { Mascot } from "../ui/mascot";
 
 export class TerminalChatUi {
   private container: HTMLElement;
@@ -6,6 +7,7 @@ export class TerminalChatUi {
   private messagesContainer!: HTMLElement;
   private inputElement!: HTMLInputElement;
   private engineTagElement!: HTMLElement;
+  private mascot!: Mascot;
   private isMinimized = false;
   private isFullscreen = false;
   private isStreaming = false;
@@ -19,29 +21,29 @@ export class TerminalChatUi {
   }
 
   private render(): void {
-    this.container.className = "chat-dock";
+    this.container.className = "chat-dock hidden";
     this.container.innerHTML = `
       <div class="chat-header" id="chat-header">
         <div class="chat-title-group">
-          <span class="chat-pulse-icon" style="font-weight: 700; font-size: 0.85rem; color: #38bdf8;">&gt;_&lt;</span>
+          <span class="mascot" id="chat-mascot"></span>
           <span class="chat-title">GANESHAN // AI_ASSISTANT</span>
           <button class="chat-engine-tag" id="chat-engine-tag" title="Click to toggle between Chrome Gemini & Bedrock">
-            ✨ CHROME_GEMINI_NANO
+            INITIALIZING...
           </button>
         </div>
         <div class="chat-actions">
           <button class="chat-tool-btn" id="chat-btn-fullscreen" title="Toggle Fullscreen">⛶</button>
           <button class="chat-tool-btn" id="chat-btn-minimize" title="Minimize">─</button>
-          <button class="chat-tool-btn" id="chat-btn-close" title="Close">✕</button>
+          <button class="chat-tool-btn" id="chat-btn-close" title="Close Panel">✕</button>
         </div>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="msg-row assistant">
           <div class="msg-header">
-            <span class="msg-assistant-tag">&gt;_&lt; CHROME_GEMINI_NANO</span>
-            <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+            <span class="msg-assistant-tag">&gt;_&lt; GANESHAN_AI</span>
+            <span class="msg-time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
           </div>
-          <div class="msg-body">Chrome Gemini AI Assistant active. Ask me about Ganeshan's work at PibyThree, LangGraph multi-agent architectures, Celery evaluation sidecars, or production Graph RAG.
+          <div class="msg-body">Terminal AI Assistant initialized. Ask me about Ganeshan's work at PibyThree, LangGraph multi-agent architectures, Celery evaluation sidecars, or production Graph RAG.
 Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for quick answers.</div>
         </div>
       </div>
@@ -55,7 +57,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
       </div>
       <div class="chat-input-bar">
         <span class="chat-input-prefix">&gt;</span>
-        <input type="text" class="chat-input" id="chat-input" placeholder="Ask Chrome Gemini Assistant or type /help..." autocomplete="off" />
+        <input type="text" class="chat-input" id="chat-input" placeholder="Ask AI Assistant or type /help..." autocomplete="off" />
         <button class="chat-send-btn" id="chat-send-btn">SEND</button>
       </div>
     `;
@@ -63,6 +65,17 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     this.messagesContainer = this.container.querySelector("#chat-messages") as HTMLElement;
     this.inputElement = this.container.querySelector("#chat-input") as HTMLInputElement;
     this.engineTagElement = this.container.querySelector("#chat-engine-tag") as HTMLElement;
+
+    const mascotEl = this.container.querySelector("#chat-mascot") as HTMLElement;
+    this.mascot = new Mascot(mascotEl);
+    this.mascot.startIdleBlink();
+
+    this.controller.onEngineSwitchCallback = (newEngine, reason) => {
+      this.updateEngineBadge(newEngine);
+      if (reason) {
+        this.appendSystemMessage(`ℹ System Notice: ${reason} Active: **${newEngine}**`);
+      }
+    };
   }
 
   private async initEngine(): Promise<void> {
@@ -71,16 +84,15 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
   }
 
   private updateEngineBadge(mode: string): void {
+    this.engineTagElement.textContent = mode;
     if (mode.includes("CHROME")) {
-      this.engineTagElement.innerHTML = `✨ CHROME_GEMINI`;
-      this.engineTagElement.style.color = "#38bdf8";
-      this.engineTagElement.style.borderColor = "rgba(56, 189, 248, 0.4)";
+      this.engineTagElement.style.color = "#00cccc";
+      this.engineTagElement.style.borderColor = "rgba(0, 204, 204, 0.4)";
       this.inputElement.placeholder = "Ask Chrome Gemini Assistant or type /help...";
     } else {
-      this.engineTagElement.innerHTML = `⚡ BEDROCK_STREAM`;
       this.engineTagElement.style.color = "#4ade80";
       this.engineTagElement.style.borderColor = "rgba(74, 222, 128, 0.4)";
-      this.inputElement.placeholder = "Ask Bedrock AI Assistant or type /help...";
+      this.inputElement.placeholder = "Ask Bedrock Assistant (Claude 3.5 Sonnet)...";
     }
   }
 
@@ -114,6 +126,9 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
         e.preventDefault();
         this.handleSubmit();
       }
+    });
+    this.inputElement.addEventListener("input", () => {
+      if (!this.isStreaming) this.mascot.setState("typing");
     });
 
     // Quick prompt chip clicks
@@ -166,7 +181,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
       <div class="msg-row assistant">
         <div class="msg-header">
           <span class="msg-assistant-tag">SYSTEM</span>
-          <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+          <span class="msg-time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
         </div>
         <div class="msg-body">[Buffer cleared]. Ready for new queries.</div>
       </div>
@@ -201,13 +216,13 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     this.appendUserMessage(text);
 
     // Create assistant streaming message node
-    const engineName = this.controller.getActiveEngine() === "chrome-gemini" ? "CHROME_GEMINI" : "BEDROCK";
+    const engineTag = this.controller.getActiveEngine() === "chrome-gemini" ? "CHROME_GEMINI" : "BEDROCK";
     const assistantRow = document.createElement("div");
     assistantRow.className = "msg-row assistant";
     assistantRow.innerHTML = `
       <div class="msg-header">
-        <span class="msg-assistant-tag">&gt;_&lt; ${engineName}</span>
-        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+        <span class="msg-assistant-tag">&gt;_&lt; ${engineTag}</span>
+        <span class="msg-time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
       <div class="msg-body"><span class="cursor-blink">▋</span></div>
     `;
@@ -217,6 +232,8 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     const bodySpan = assistantRow.querySelector(".msg-body") as HTMLElement;
     let accumulatedText = "";
     this.isStreaming = true;
+    this.setSendingState(true);
+    this.mascot.setState("thinking");
 
     try {
       await this.controller.sendMessage(text, (chunk) => {
@@ -228,12 +245,23 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
           bodySpan.innerHTML = this.formatMarkdown(accumulatedText);
         }
       });
-    } catch (err) {
-      bodySpan.innerHTML = `<span style="color: var(--color-status-red)">[ERROR: Stream connection failed (${(err as Error).message})]</span>`;
+      this.mascot.setState("happy");
+    } catch {
+      bodySpan.innerHTML = `<span style="color: var(--color-status-red)">ENGINE_ERROR: Unable to connect. Try /contact for direct reach.</span>`;
+      this.mascot.setState("error");
     } finally {
       this.isStreaming = false;
+      this.setSendingState(false);
       this.scrollToBottom();
     }
+  }
+
+  private setSendingState(sending: boolean): void {
+    const sendBtn = this.container.querySelector("#chat-send-btn") as HTMLButtonElement;
+    sendBtn.disabled = sending;
+    sendBtn.textContent = sending ? "..." : "SEND";
+    this.inputElement.disabled = sending;
+    if (!sending) this.inputElement.focus();
   }
 
   private appendUserMessage(text: string): void {
@@ -242,7 +270,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     row.innerHTML = `
       <div class="msg-header">
         <span class="msg-user-tag">YOU</span>
-        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+        <span class="msg-time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
       <div class="msg-body">${this.escapeHtml(text)}</div>
     `;
@@ -256,7 +284,7 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
     row.innerHTML = `
       <div class="msg-header">
         <span class="msg-assistant-tag">SYSTEM</span>
-        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+        <span class="msg-time">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
       </div>
       <div class="msg-body">${this.formatMarkdown(text)}</div>
     `;
@@ -277,11 +305,8 @@ Type <code>/projects</code>, <code>/skills</code>, or <code>/contact</code> for 
 
   private formatMarkdown(str: string): string {
     let html = this.escapeHtml(str);
-    // Bold
     html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    // Inline code
     html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-    // Headers
     html = html.replace(/^### (.*$)/gim, '<div style="font-weight:700; color:var(--color-blue-primary); margin:0.35rem 0;">$1</div>');
     return html;
   }

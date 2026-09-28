@@ -1,6 +1,6 @@
 import { Particle } from "./particle";
 import { Vector2D } from "./vector2d";
-import { TECH_CLUSTERS_CONFIG } from "../render/ascii_glyphs";
+import { TECH_CLUSTERS_CONFIG, TechClusterMeta } from "../render/ascii_glyphs";
 
 export interface ClusterConfig {
   id: number;
@@ -25,6 +25,8 @@ export class Cluster {
   public wanderRadius: number;
   public color: string;
   public themeTitle: string;
+  public meta: TechClusterMeta;
+  public isHovered = false;
 
   constructor(cfg: ClusterConfig) {
     this.id = cfg.id;
@@ -33,33 +35,53 @@ export class Cluster {
     this.radius = cfg.radius;
     this.gravityStrength = cfg.gravityStrength;
     this.wanderAngle = Math.random() * Math.PI * 2;
-    this.wanderSpeed = cfg.wanderSpeed ?? 0.003 + Math.random() * 0.003;
-    this.wanderRadius = 20 + Math.random() * 25;
-    this.color = cfg.color ?? "#38bdf8";
+    this.wanderSpeed = cfg.wanderSpeed ?? 0.0015 + Math.random() * 0.002;
+    this.wanderRadius = 14 + Math.random() * 12;
+    this.color = cfg.color ?? "#00cccc";
 
     const clusterData = TECH_CLUSTERS_CONFIG[cfg.id % TECH_CLUSTERS_CONFIG.length];
+    this.meta = clusterData;
     this.themeTitle = cfg.themeTitle ?? clusterData.theme;
 
-    this.initParticles(cfg.particleCount, clusterData.tags);
+    // Filter valid non-empty tags strictly
+    const validTags = clusterData.tags.filter(
+      (t) => typeof t === "string" && t.trim().length > 0 && t !== "undefined"
+    );
+
+    this.initParticles(cfg.particleCount, validTags);
   }
 
-  private initParticles(count: number, tags: string[]): void {
+  private initParticles(count: number, validTags: string[]): void {
+    const numTags = validTags.length;
+
     for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const r = Math.pow(Math.random(), 0.55) * this.radius;
+      const hasTag = i < numTags;
+      const tag = hasTag ? validTags[i] : null;
+      const isSpinner = !hasTag && Math.random() < 0.25;
+
+      let angle: number;
+      let r: number;
+
+      if (hasTag) {
+        // Distribute tags evenly in an outward staggered ring
+        const baseAngle = (i / numTags) * Math.PI * 2;
+        const stagger = (i % 2 === 0 ? 0.75 : 1.15);
+        angle = baseAngle;
+        r = this.radius * stagger;
+      } else {
+        angle = Math.random() * Math.PI * 2;
+        r = Math.pow(Math.random(), 0.5) * (this.radius * 1.3);
+      }
+
       const px = this.center.x + Math.cos(angle) * r;
       const py = this.center.y + Math.sin(angle) * r;
-
-      const tag = i < tags.length && typeof tags[i] === "string" && tags[i].trim() ? tags[i] : null;
-      const isLabel = tag !== null;
-      const isSpinner = !isLabel && Math.random() < 0.25;
 
       let type: "dot" | "ascii" | "spinner" | "label" = "dot";
       let char = "•";
       let label = "";
       let size = 2.5 + Math.random() * 2;
 
-      if (isLabel && tag) {
+      if (tag) {
         type = "label";
         label = tag;
         size = 11;
@@ -79,12 +101,12 @@ export class Cluster {
         type,
         char,
         label,
-        mass: isLabel ? 1.5 : 0.9 + Math.random() * 1.2,
+        mass: tag ? 1.8 : 0.9 + Math.random() * 1.2,
         color: this.color,
         size,
         clusterId: this.id,
         orbitRadius: r,
-        orbitSpeed: (0.003 + Math.random() * 0.005) * (Math.random() > 0.5 ? 1 : -1),
+        orbitSpeed: (0.001 + Math.random() * 0.002) * (i % 2 === 0 ? 1 : -1),
         orbitAngle: angle,
       });
 
@@ -93,28 +115,49 @@ export class Cluster {
   }
 
   public update(): void {
-    // Gentle centroid orbital wander
+    // Gentle centroid wander
     this.wanderAngle += this.wanderSpeed;
     this.center.x = this.baseCenter.x + Math.cos(this.wanderAngle) * this.wanderRadius;
-    this.center.y = this.baseCenter.y + Math.sin(this.wanderAngle) * (this.wanderRadius * 0.7);
+    this.center.y = this.baseCenter.y + Math.sin(this.wanderAngle) * (this.wanderRadius * 0.6);
 
-    // Update each particle's home position based on dynamic cluster orbit
+    const pLen = this.particles.length;
+
+    // Label-aware collision repulsion (wider horizontally than vertically)
+    for (let i = 0; i < pLen; i++) {
+      const p1 = this.particles[i];
+      for (let j = i + 1; j < pLen; j++) {
+        const p2 = this.particles[j];
+        const dx = p1.pos.x - p2.pos.x;
+        const dy = (p1.pos.y - p2.pos.y) * 1.6;
+        const distSq = dx * dx + dy * dy;
+        const minDist = (p1.type === "label" && p2.type === "label") ? 68 : 28;
+
+        if (distSq < minDist * minDist && distSq > 0.01) {
+          const dist = Math.sqrt(distSq);
+          const pushForce = ((minDist - dist) / minDist) * 0.75;
+          const forceVec = new Vector2D((dx / dist) * pushForce, ((p1.pos.y - p2.pos.y) / dist) * pushForce);
+          p1.applyForce(forceVec);
+          p2.applyForce(Vector2D.mult(forceVec, -1));
+        }
+      }
+    }
+
+    // Gravitational home attraction
     for (const p of this.particles) {
       const homeX = this.center.x + Math.cos(p.orbitAngle) * p.orbitRadius;
-      const homeY = this.center.y + Math.sin(p.orbitAngle) * p.orbitRadius;
+      const homeY = this.center.y + Math.sin(p.orbitAngle) * (p.orbitRadius * 0.85);
       p.homePos.set(homeX, homeY);
 
-      // Gravitational attraction toward dynamic home position
       const toHome = Vector2D.sub(p.homePos, p.pos);
       const dist = toHome.mag();
 
       if (dist > 0.5) {
         const springForce = dist * this.gravityStrength;
-        toHome.normalize().mult(Math.min(springForce, 4.0));
+        toHome.normalize().mult(Math.min(springForce, 3.5));
         p.applyForce(toHome);
       }
 
-      p.update(0.93);
+      p.update(0.92);
     }
   }
 }
